@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* 🎨 Theme configuration (Tailwind v4 way) */
+@theme {
+  --color-brand-red: #C4151C;
+  --color-brand-orange: #F27A29;
+  --color-brand-bg: #FCF7F4;
+
+  --font-sans: "Inter", sans-serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: scroll 40s linear infinite;
+  --animate-fade-in-up: fadeInSlideUp 1s ease-out forwards;
+}
+
+/* 🧠 Keyframes (still normal CSS) */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes fadeInSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🌱 Base styling */
+@layer base {
+  body {
+    background-color: var(--color-brand-bg);
+    font-family: var(--font-sans);
+  }
+}
