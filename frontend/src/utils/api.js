@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// 1. Point specifically to the /api folder
+// 1. Use environment variable for API URL
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // <--- MAKE SURE THIS SAYS /api
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
 });
 
 // 2. Automatically attach token IF it exists (for Admin pages)
