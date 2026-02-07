@@ -9,8 +9,8 @@
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
     "start": "node src/index.js",
-    "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles",
-    "e2e:start": "node tests/e2e-server.js"
+    "versel-start" : "node src/index.js"
+   
   },
   "keywords": [],
   "dependencies": {
