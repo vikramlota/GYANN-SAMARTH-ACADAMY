@@ -7,6 +7,9 @@ console.log('API baseURL:', normalizedBase);
 const api = axios.create({
   baseURL: normalizedBase,
   withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 // 2. Automatically attach token IF it exists (for Admin pages)
