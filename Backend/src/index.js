@@ -15,7 +15,7 @@ connectDB()
     
     // Only try to seed if we have the function and variables
     try {
-        const seedAdmin = require('./utils/AdminSeeder.js');
+        const seedAdmin = require('./utils/adminseeder.js');
         if(process.env.ADMIN_EMAIL) {
             seedAdmin();
         }
