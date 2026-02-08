@@ -34,7 +34,3 @@ if (process.env.VERCEL) {
         console.log(`⚙️  Server is running at port : ${PORT}`);
     });
 } 
-
-module.exports = (req, res) => {
-    res.status(200).send("VICTORY! The server is alive. The issue is inside app.js");
-};
