@@ -4,7 +4,7 @@ dotenv.config({ path: './.env' });
 
 const connectDB = require('./db/index.js');
 const { app } = require('./app.js');
-const seedAdmin = require('./utils/AdminSeeder.js');
+
 const serverless = require('serverless-http');
 
 
@@ -15,7 +15,7 @@ connectDB()
     
     // Only try to seed if we have the function and variables
     try {
-        const seedAdmin = require('./utils/seedAdmin.js');
+        const seedAdmin = require('./utils/AdminSeeder.js');
         if(process.env.ADMIN_EMAIL) {
             seedAdmin();
         }
