@@ -11,21 +11,24 @@ const serverless = require('serverless-http');
 // Connect once (reused across lambda invocations where possible)
 connectDB()
   .then(() => {
-    console.log("Database connected successfully.");
+    // console.log("Database connected.");
     
-    // Only try to seed if we have the function and variables
-    try {
-        const seedAdmin = require('./utils/adminSeeder.js');
-        if(process.env.ADMIN_EMAIL) {
-            seedAdmin();
-        }
-    } catch (e) {
-        console.error("Seeding failed but server is running:", e.message);
-    }
+    // COMMENT THIS OUT TO SPEED UP LOGIN:
+    // try {
+    //     if(process.env.ADMIN_EMAIL) {
+    //         seedAdmin();
+    //     }
+    // } catch (e) {
+    //     console.error("Seeding failed:", e.message);
+    // }
+    
+    app.on("error", (error) => {
+        console.log("ERRR: ", error);
+        throw error;
+    });
   })
   .catch((err) => {
-    // LOG THE ERROR SO YOU CAN SEE IT IN VERCEL LOGS
-    console.error("!!! MONGO DB CRITICAL ERROR !!!", err);
+    console.log('MONGO DB connection failed !!!', err);
   });
 // If running on Vercel (serverless) export the handler, otherwise start a listener
 if (process.env.VERCEL) {
