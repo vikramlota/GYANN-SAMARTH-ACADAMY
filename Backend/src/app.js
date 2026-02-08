@@ -29,12 +29,15 @@ app.use(cors({
 
 // --- 3. MANUALLY HANDLE PREFLIGHT REQUESTS ---
 // This acts as a safety net if the middleware fails
-app.options('(.*)', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', 'https://samarthacadam.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    return res.sendStatus(200);
+  }
+  next();
 });
 
 
