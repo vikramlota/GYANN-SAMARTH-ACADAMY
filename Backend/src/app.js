@@ -4,11 +4,27 @@ const cookieParser = require("cookie-parser");
 
 const app = express()
 
-app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
+// trust proxy when running behind Vercel / proxies (for secure cookies)
+app.set('trust proxy', 1)
 
-}))
+// allow single origin or comma-separated list in CORS_ORIGIN
+const rawOrigins = process.env.CORS_ORIGIN || '';
+const allowedOrigins = rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            // allow requests with no origin (like curl, server-to-server)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.length === 0) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                return callback(null, true);
+            } else {
+                return callback(new Error('CORS policy does not allow this origin'), false);
+            }
+        },
+        credentials: true,
+    })
+)
 
 app.use(express.json({limit: "16kb"}))
 app.use(express.urlencoded({extended: true,limit: "16kb"}))
