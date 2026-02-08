@@ -4,8 +4,9 @@ dotenv.config({ path: './.env' });
 
 const connectDB = require('./db/index.js');
 const { app } = require('./app.js');
+const seedAdmin = require('./utils/adminseeder.js');
 const serverless = require('serverless-http');
-const seedAdmin = require('./utils/adminSeeder.js');
+
 
 // Connect once (reused across lambda invocations where possible)
 connectDB()
