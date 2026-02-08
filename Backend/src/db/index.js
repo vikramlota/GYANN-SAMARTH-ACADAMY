@@ -1,12 +1,11 @@
-import mongoose from "mongoose";
-import { DB_NAME } from "../constants.js"; // Ensure you have this or remove DB_NAME usage
+const mongoose = require("mongoose");
+const { DB_NAME } = require("../constants.js"); // Ensure this file uses module.exports too, or remove if unused
 
 const connectDB = async () => {
     try {
-        // 1. LOG THE URI TO DEBUG (Hide password for safety if viewing logs publicly)
-        // This helps you see if Vercel is actually reading the variable
         console.log("Attempting to connect to MongoDB..."); 
-
+        
+        // Remove DB_NAME if you added it directly to the Connection String in Vercel
         const connectionInstance = await mongoose.connect(`${process.env.MONGO_URI}/${DB_NAME || 'test'}`);
         
         console.log(`\n MongoDB connected !! DB HOST: ${connectionInstance.connection.host}`);
@@ -16,4 +15,4 @@ const connectDB = async () => {
     }
 }
 
-export default connectDB;
+module.exports = connectDB; // <--- This fixes the "is not a function" error

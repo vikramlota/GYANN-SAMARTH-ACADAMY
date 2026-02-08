@@ -6,7 +6,7 @@ const ManageUpdates = () => {
   const [updates, setUpdates] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    title: '', description: '', type: 'job', linkUrl: '' , isNew: true
+    title: '', description: '', type: 'job', linkUrl: '' , isLatest: true
   });
   const [imageFile, setImageFile] = useState(null);
 
@@ -30,7 +30,7 @@ const ManageUpdates = () => {
     try {
       await api.post('/notifications', data);
       alert('Update Posted!');
-      setFormData({ title: '', description: '', type: 'job', linkUrl: '', isNew: true });
+      setFormData({ title: '', description: '', type: 'job', linkUrl: '', isLatest: true });
       setImageFile(null);
       fetchUpdates();
     } catch (error) { 

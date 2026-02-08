@@ -19,7 +19,7 @@ const UpdateSchema = new mongoose.Schema({
     type: String,
     required: false // Optional, in case it's just a text notice
   },
-  isNew: {
+  isLatest: {
     type: Boolean,
     default: true
   },
