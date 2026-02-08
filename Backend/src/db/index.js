@@ -25,11 +25,11 @@ const connectDB = async () => {
 
     try {
         // 3. CLEAN & CONNECT
-        let uri = process.env.MONGO_URI || "";
+        let uri = process.env.MONGODB_URI || "";
         uri = uri.replace(/^["']|["']$/g, '').trim(); // Remove quotes/spaces
 
         if (!uri) {
-            throw new Error("MONGO_URI is missing");
+            throw new Error("MONGODB_URI is missing");
         }
 
         const dbName = DB_NAME || 'test';
