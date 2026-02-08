@@ -22,6 +22,9 @@ app.get('/api/test', (req, res) => {
 */
 // 3. Export for Vercel IMMEDIATELY
 // This ensures Vercel sees the app is ready instantly
+app.get('/test-express', (req, res) => {
+    res.json({ message: "Express is working! The issue is definitely the DB." });
+});
 if (process.env.VERCEL) {
     module.exports = serverless(app);
 } else {
