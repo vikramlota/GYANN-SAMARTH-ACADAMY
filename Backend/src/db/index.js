@@ -3,7 +3,7 @@ const { DB_NAME } = require("../constants.js");
 
 const connectDB = async () => {
     try {
-        let uri = process.env.MONGO_URI;
+        let uri = process.env.MONGODB_URI;
 
         // --- DEBUGGING BLOCK ---
         if (!uri) {
