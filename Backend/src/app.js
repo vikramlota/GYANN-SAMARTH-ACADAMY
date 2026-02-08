@@ -10,6 +10,10 @@ const allowedOrigins = [
   "http://localhost:5174"
 ];
 
+// Add this BEFORE your other app.use() routes
+app.get('/api/health', (req, res) => {
+    res.send("Server is ALIVE! The issue is the Database.");
+});
 // --- 2. CORS MIDDLEWARE (MUST BE FIRST) ---
 app.use(cors({
   origin: function (origin, callback) {
@@ -26,6 +30,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
+
 
 // --- 3. MANUALLY HANDLE PREFLIGHT REQUESTS ---
 // This acts as a safety net if the middleware fails
