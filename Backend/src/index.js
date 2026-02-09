@@ -1,8 +1,6 @@
 require('dotenv').config({ path: './.env' });
 const { app } = require('./app.js');
 const serverless = require('serverless-http');
-
-const serverless = require('serverless-http');
 /*
 // 1. Start DB Connection in the Background (Fire and Forget)
 // Do NOT wait for it with 'await' or '.then()' before exporting
