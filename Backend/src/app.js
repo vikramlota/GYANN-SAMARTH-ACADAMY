@@ -23,20 +23,6 @@ app.get("/api/v1/health", (req, res) => {
     });
 });
 
-// --- 3. MANUALLY HANDLE PREFLIGHT REQUESTS ---
-// This acts as a safety net if the middleware fails
-/* app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Origin', 'https://samarthacadam.vercel.app');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    return res.sendStatus(200);
-  }
-  next();
-});
- */
-
 app.use(express.json({limit: "16kb"}))
 app.use(express.urlencoded({extended: true,limit: "16kb"}))
 app.use(express.static("public"))
