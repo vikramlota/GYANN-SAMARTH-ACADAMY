@@ -1,33 +1,19 @@
 require('dotenv').config({ path: './.env' });
 const { app } = require('./app.js');
 const serverless = require('serverless-http');
-/*
-// 1. Start DB Connection in the Background (Fire and Forget)
-// Do NOT wait for it with 'await' or '.then()' before exporting
-const connectDB = require('./db/index.js');
-console.log("--> Initializing Server...");
-connectDB().catch(err => console.error("Background DB Connect Error:", err));
 
-// 2. Add a simple root route to verify the server is running
-app.get('/', (req, res) => {
-    res.send("Server is Running! (Database might still be connecting)");
-}); 
+// 1. EXPORT HANDLER (For Vercel)
+// Vercel looks for this export to handle the request.
+module.exports = serverless(app);
 
-app.get('/api/test', (req, res) => {
-    res.json({ message: "Server is working! The issue is definitely the DB." });
-});
-*/
-// 3. Export for Vercel IMMEDIATELY
-// This ensures Vercel sees the app is ready instantly
 
-// Note: We DO NOT call connectDB() here anymore. 
-// It is handled inside app.js middleware.
-
-if (process.env.VERCEL) {
-    module.exports = serverless(app);
-} else {
+// 2. LOCAL DEV SERVER (For your computer only)
+// This checks: "Is this file being run directly by Node?"
+// If yes -> Start listening.
+// If no (Vercel imports it) -> Do NOT listen.
+if (require.main === module) {
     const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => {
-        console.log(`⚙️ Server is running at port : ${PORT}`);
+        console.log(`⚙️  Server is running at port : ${PORT}`);
     });
 }

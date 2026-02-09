@@ -5,12 +5,6 @@ const connectDB = require('./db/index.js');
 
 const app = express()
 
-const allowedOrigins = [
-  process.env.CORS_ORIGIN,
-  "http://localhost:5173",
-  "http://localhost:5174",
-  
-];
 
 app.use(async (req, res, next) => {
     try {
@@ -27,25 +21,21 @@ app.get("/api/v1/health", (req, res) => {
 });
 // --- 2. CORS MIDDLEWARE (MUST BE FIRST) ---
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+  origin: process.env.CORS_ORIGIN || "*", 
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+  //methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  //allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
-
+app.get("/api/v1/health", (req, res) => {
+    res.status(200).json({ 
+        status: "OK", 
+        message: "Server is running perfectly! (DB is OFF for testing)" 
+    });
+});
 
 // --- 3. MANUALLY HANDLE PREFLIGHT REQUESTS ---
 // This acts as a safety net if the middleware fails
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Origin', 'https://samarthacadam.vercel.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -55,21 +45,21 @@ app.use((req, res, next) => {
   }
   next();
 });
+ */
 
+//app.use(express.json({limit: "16kb"}))
+//app.use(express.urlencoded({extended: true,limit: "16kb"}))
 
-app.use(express.json({limit: "16kb"}))
-app.use(express.urlencoded({extended: true,limit: "16kb"}))
-
-app.use(express.static("public"))
+//app.use(express.static("public"))
 app.use(cookieParser())
 
 // routes import 
-
+/* 
 app.use('/api/admin', require('./routes/Admin.routes.js'));
 app.use('/api/courses', require('./routes/course.routes.js'));
 app.use('/api/results', require('./routes/result.routes.js'));
 app.use('/api/notifications', require('./routes/update.routes.js'));
 app.use('/api/leads', require('./routes/lead.routes.js'));
 app.use('/api/current-affairs', require('./routes/currentaffairs.routes.js'));
-
+ */
 module.exports = {app};
