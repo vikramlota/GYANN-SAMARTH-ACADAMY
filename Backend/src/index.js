@@ -1,5 +1,5 @@
 require('dotenv').config({ path: './.env' });
-const { app } = require('./app.js');
+const app = require('./app.js');
 const serverless = require('serverless-http');
 
 // Export handler for Vercel serverless
