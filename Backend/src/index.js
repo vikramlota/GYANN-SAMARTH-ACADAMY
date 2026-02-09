@@ -1,20 +1,12 @@
 require('dotenv').config({ path: './.env' });
-const { app } = require('./app.js'); // <--- Re-enable App
+const { app } = require('./app.js'); // Matches "module.exports = { app }"
+const connectDB = require('./db/index.js');
 const serverless = require('serverless-http');
 
-/* KEEP DATABASE OFF FOR NOW 
-   We want to see if the Express App itself works.
-*/
-// const connectDB = require('./db/index.js');
-// connectDB()
-//  .then(() => console.log("DB Connected"))
-//  .catch(err => console.log("DB Error", err));
+// 1. Connect to DB (Background)
+connectDB();
 
-// Add a test route to bypass your other routes
-app.get('/test-express', (req, res) => {
-    res.json({ message: "Express is working! The issue is definitely the DB." });
-});
-
+// 2. Export Handler
 if (process.env.VERCEL) {
     module.exports = serverless(app);
 } else {
