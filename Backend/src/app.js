@@ -5,8 +5,23 @@ const connectDB = require('./db/index.js');
 
 const app = express()
 
-// Connect to DB ONCE on startup (not on every request)
-connectDB().catch(err => console.error("Failed to connect DB on startup:", err));
+// Initialize DB connection on first request to any route (don't block startup)
+let dbInitialized = false;
+
+app.use(async (req, res, next) => {
+  try {
+    // Only try to connect once per serverless function lifecycle
+    if (!dbInitialized) {
+      dbInitialized = true;
+      await connectDB();
+    }
+    next();
+  } catch (error) {
+    // Connection failed but continue anyway - health checks should still work
+    console.error("DB connection middleware error:", error);
+    next();
+  }
+});
 
 app.use(cors({
   origin: process.env.CORS_ORIGIN || "https://samarthacadam.vercel.app", 
@@ -27,6 +42,14 @@ app.use(express.json({limit: "16kb"}))
 app.use(express.urlencoded({extended: true,limit: "16kb"}))
 app.use(express.static("public"))
 app.use(cookieParser())
+
+// Timeout protection - prevent Vercel timeout (max 30s)
+app.use((req, res, next) => {
+  res.setTimeout(25000, () => {
+    res.status(408).json({ error: 'Request timeout' });
+  });
+  next();
+});
 
 // Routes
 app.use('/api/admin', require('./routes/Admin.routes.js'));
