@@ -9,7 +9,7 @@ const app = express()
 connectDB().catch(err => console.error("Failed to connect DB on startup:", err));
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "*", 
+  origin: process.env.CORS_ORIGIN || "https://samarthacadam.vercel.app", 
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
@@ -35,4 +35,19 @@ app.use('/api/results', require('./routes/result.routes.js'));
 app.use('/api/notifications', require('./routes/update.routes.js'));
 app.use('/api/leads', require('./routes/lead.routes.js'));
 app.use('/api/current-affairs', require('./routes/currentaffairs.routes.js'));
+
+// Global error handler - catches any unhandled errors
+app.use((err, req, res, next) => {
+  console.error('🔴 ERROR:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 module.exports = {app};
