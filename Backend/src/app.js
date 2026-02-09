@@ -15,10 +15,6 @@ app.use(async (req, res, next) => {
     }
 });
 
-// Add this BEFORE your other app.use() routes
-app.get("/api/v1/health", (req, res) => {
-    res.status(200).json({ message: "Server is connected and healthy!" });
-});
 // --- 2. CORS MIDDLEWARE (MUST BE FIRST) ---
 app.use(cors({
   origin: process.env.CORS_ORIGIN || "*", 
@@ -47,12 +43,14 @@ app.get("/api/v1/health", (req, res) => {
 });
  */
 
-//app.use(express.json({limit: "16kb"}))
+app.use(express.json())
 //app.use(express.urlencoded({extended: true,limit: "16kb"}))
 
 //app.use(express.static("public"))
 app.use(cookieParser())
-
+app.get("/api/v1/health", (req, res) => {
+    res.status(200).json({ message: "Server is connected and healthy!" });
+});
 // routes import 
 /* 
 app.use('/api/admin', require('./routes/Admin.routes.js'));

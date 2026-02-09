@@ -11,9 +11,9 @@ module.exports = serverless(app);
 // This checks: "Is this file being run directly by Node?"
 // If yes -> Start listening.
 // If no (Vercel imports it) -> Do NOT listen.
-if (require.main === module) {
+/* if (require.main === module) {
     const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => {
         console.log(`⚙️  Server is running at port : ${PORT}`);
     });
-}
+} */
