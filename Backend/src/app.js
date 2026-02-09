@@ -43,14 +43,6 @@ app.use(express.urlencoded({extended: true,limit: "16kb"}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
-// Timeout protection - prevent Vercel timeout (max 30s)
-app.use((req, res, next) => {
-  res.setTimeout(25000, () => {
-    res.status(408).json({ error: 'Request timeout' });
-  });
-  next();
-});
-
 // Routes
 app.use('/api/admin', require('./routes/Admin.routes.js'));
 app.use('/api/courses', require('./routes/course.routes.js'));
