@@ -5,27 +5,21 @@ const connectDB = require('./db/index.js');
 
 const app = express()
 
+// Connect to DB ONCE on startup (not on every request)
+connectDB().catch(err => console.error("Failed to connect DB on startup:", err));
 
-app.use(async (req, res, next) => {
-    try {
-        await connectDB(); // Wait for DB here, only when a user asks for something
-        next();
-    } catch (error) {
-        res.status(500).json({ error: "Database Connection Failed" });
-    }
-});
-
-// --- 2. CORS MIDDLEWARE (MUST BE FIRST) ---
 app.use(cors({
   origin: process.env.CORS_ORIGIN || "*", 
   credentials: true,
-  //methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  //allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
+
+// Health check endpoint
 app.get("/api/v1/health", (req, res) => {
     res.status(200).json({ 
         status: "OK", 
-        message: "Server is running perfectly! (DB is OFF for testing)" 
+        message: "Server is running!" 
     });
 });
 
@@ -43,21 +37,16 @@ app.get("/api/v1/health", (req, res) => {
 });
  */
 
-app.use(express.json())
-//app.use(express.urlencoded({extended: true,limit: "16kb"}))
-
-//app.use(express.static("public"))
+app.use(express.json({limit: "16kb"}))
+app.use(express.urlencoded({extended: true,limit: "16kb"}))
+app.use(express.static("public"))
 app.use(cookieParser())
-app.get("/api/v1/health", (req, res) => {
-    res.status(200).json({ message: "Server is connected and healthy!" });
-});
-// routes import 
-/* 
+
+// Routes
 app.use('/api/admin', require('./routes/Admin.routes.js'));
 app.use('/api/courses', require('./routes/course.routes.js'));
 app.use('/api/results', require('./routes/result.routes.js'));
 app.use('/api/notifications', require('./routes/update.routes.js'));
 app.use('/api/leads', require('./routes/lead.routes.js'));
 app.use('/api/current-affairs', require('./routes/currentaffairs.routes.js'));
- */
 module.exports = {app};

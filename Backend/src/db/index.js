@@ -41,6 +41,9 @@ const connectDB = async () => {
             bufferCommands: false, // Don't queue queries if disconnected
             serverSelectionTimeoutMS: 5000, // Fail fast if DB is down
             socketTimeoutMS: 45000, // Close idle sockets
+            maxPoolSize: 10,
+            minPoolSize: 2,
+            family: 4 // IPv4
         });
 
         isConnected = db.connections[0].readyState;
