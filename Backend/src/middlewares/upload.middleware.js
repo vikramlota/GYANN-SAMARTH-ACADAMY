@@ -1,18 +1,21 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
-// For Vercel serverless, use memory storage instead of disk storage
-// Disk storage doesn't persist and causes issues on serverless platforms
-const storage = process.env.NODE_ENV === 'production' 
-  ? multer.memoryStorage()
-  : multer.diskStorage({
-      destination(req, file, cb) {
-        cb(null, 'public/uploads/');
-      },
-      filename(req, file, cb) {
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-      },
-    });
+// Ensure uploads directory exists
+if (!fs.existsSync('public/uploads/')) {
+  fs.mkdirSync('public/uploads/', { recursive: true });
+}
+
+// Use disk storage for all environments (needed for Cloudinary processing)
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, 'public/uploads/');
+  },
+  filename(req, file, cb) {
+    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+  },
+});
 
 function checkFileType(file, cb) {
   const filetypes = /jpg|jpeg|png|pdf/;

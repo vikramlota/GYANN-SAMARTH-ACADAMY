@@ -14,7 +14,7 @@ const AdminLayout = () => {
     <div className="min-h-screen flex">
       <aside className="w-64 bg-white border-r p-4">
         <div className="mb-6 font-bold text-lg">Admin</div>
-        <nav className="flex flex-col gap-2 text-sm">
+        <nav className="flex flex-col gap-2 text-sm ">
           <a href="/admin/dashboard" className="text-gray-700 hover:underline">Dashboard</a>
           <a href="/admin/courses" className="text-gray-700 hover:underline">Manage Courses</a>
           <a href="/admin/updates" className="text-gray-700 hover:underline">Manage Updates</a>

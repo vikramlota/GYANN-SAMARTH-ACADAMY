@@ -13,6 +13,21 @@ const CoursesPage = () => {
        .finally(() => setLoading(false));
   }, []);
 
+  // Construct full image URL
+  const getImageUrl = (course) => {
+    if (course.image) {
+      // If image is a relative path like /uploads/..., construct full URL
+      if (course.image.startsWith('/uploads/')) {
+        const apiBase = import.meta.env.VITE_API_URL || 'https://gyann-samarth-acadamy2.vercel.app/api';
+        const baseUrl = apiBase.replace('/api', '');
+        return `${baseUrl}${course.image}`;
+      }
+      // If it's already a full URL, return as is
+      return course.image;
+    }
+    return "https://placehold.co/400x250";
+  };
+
   if (loading) return <div className="text-center py-20">Loading Courses...</div>;
 
   return (
@@ -23,7 +38,7 @@ const CoursesPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
            {courses.map(course => (
              <div key={course._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all">
-                <img src={course.imageUrl || "https://placehold.co/400x250"} alt={course.title} className="w-full h-48 object-cover"/>
+                <img src={getImageUrl(course)} alt={course.title} className="w-full h-48 object-cover"/>
                 <div className="p-6">
                    <h3 className="text-xl font-bold mb-2">{course.title}</h3>
                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">

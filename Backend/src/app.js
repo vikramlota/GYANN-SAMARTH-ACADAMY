@@ -12,7 +12,7 @@ connectDB().catch((error) => {
 });
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "https://samarthacadam.vercel.app", 
+  origin: process.env.CORS_ORIGIN || "https://samarthacadam.vercel.app" || "http://localhost:5173", 
   credentials: true,
 }));
 

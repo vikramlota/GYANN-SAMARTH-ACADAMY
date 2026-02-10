@@ -1,4 +1,6 @@
 const Course = require('../models/Course.model.js');
+const { uploadOnCloudinary } = require('../utils/cloudinary.js');
+const fs = require('fs');
 
 // @desc    Get all courses
 // @route   GET /api/courses
@@ -16,12 +18,22 @@ const getCourses = async (req, res) => {
 // @access  Private (Admin)
 const createCourse = async (req, res) => {
   try {
-    // Normalize multipart/form-data body when using multer
     const body = { ...req.body };
 
-    // If multer provided a file, set image path so frontend can access it
+    // Handle image upload
     if (req.file) {
-      body.image = `/uploads/${req.file.filename}`;
+      if (process.env.NODE_ENV === 'production') {
+        // Use Cloudinary for production
+        const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+        if (cloudinaryResponse && cloudinaryResponse.secure_url) {
+          body.image = cloudinaryResponse.secure_url;
+        } else {
+          throw new Error('Failed to upload image to Cloudinary');
+        }
+      } else {
+        // Use local uploads for development
+        body.image = `/uploads/${req.file.filename}`;
+      }
     }
 
     // Normalize features if sent as features[0], features[1], ... from FormData
@@ -41,6 +53,10 @@ const createCourse = async (req, res) => {
     const createdCourse = await course.save();
     res.status(201).json(createdCourse);
   } catch (error) {
+    // Clean up uploaded file if error occurs
+    if (req.file && process.env.NODE_ENV !== 'production') {
+      fs.unlinkSync(req.file.path).catch(err => console.error('Failed to delete temp file:', err));
+    }
     res.status(400).json({ message: error.message });
   }
 };
