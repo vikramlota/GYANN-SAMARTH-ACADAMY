@@ -119,8 +119,9 @@ const ManageCourses = () => {
     data.append('colorTheme[text]', themeObj.text);
     data.append('colorTheme[border]', themeObj.border);
 
-    if (imageFile) data.append('image', imageFile);
-
+    if (imageFile instanceof File) {
+      data.append('image', imageFile);
+    }
     try {
       // --- NEW: Switch between POST (Create) and PUT (Update) ---
       if (editingId) {
