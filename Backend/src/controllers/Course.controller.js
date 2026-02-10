@@ -20,15 +20,22 @@ const getCourses = async (req, res) => {
 // @access  Private (Admin)
 const createCourse = async (req, res) => {
   let tempFilePath = null;
+  
   try {
-    // 1. HARD DELETE the image field from the body first
-    // This prevents the "Cast to string failed" error immediately.
-    const body = { ...req.body };
-    delete body.image; 
+    // 1. DEBUGGING: Check what we actually received
+    console.log("➡️ Request Body:", req.body);
+    console.log("➡️ Request File:", req.file);
 
-    // 2. Handle Image Upload
-    if (req.file) {
-      try {
+    // 2. VALIDATION: Check if file exists immediately
+    // If Multer didn't pick up a file, req.file will be undefined.
+    if (!req.file) {
+        return res.status(400).json({ message: "❌ Image file is missing in the request." });
+    }
+
+    // 3. UPLOAD LOGIC
+    let imageUrl = "";
+    try {
+        // Handle Buffer (Memory Storage) vs Path (Disk Storage)
         if (req.file.buffer) {
             tempFilePath = path.join('/tmp', `${Date.now()}-${req.file.originalname}`);
             fs.writeFileSync(tempFilePath, req.file.buffer);
@@ -36,50 +43,67 @@ const createCourse = async (req, res) => {
             tempFilePath = req.file.path;
         }
         
+        console.log("➡️ Uploading to Cloudinary...");
         const cloudinaryResponse = await uploadOnCloudinary(tempFilePath);
         
-        // Only set body.image if we got a valid URL
-        if (cloudinaryResponse && cloudinaryResponse.secure_url) {
-          body.image = cloudinaryResponse.secure_url;
+        if (!cloudinaryResponse?.secure_url) {
+             throw new Error("Cloudinary returned no URL");
         }
-      } catch (uploadError) {
+        
+        imageUrl = cloudinaryResponse.secure_url;
+        console.log("✅ Image Uploaded:", imageUrl);
+
+    } catch (uploadError) {
         throw new Error(`Image upload failed: ${uploadError.message}`);
-      } finally {
+    } finally {
+        // Clean up temp file
         if (tempFilePath && fs.existsSync(tempFilePath)) {
-            try { fs.unlinkSync(tempFilePath); } catch (e) { console.error(e); }
+            try { fs.unlinkSync(tempFilePath); } catch (e) { console.error("Cleanup error:", e); }
         }
-      }
     }
 
-    // 3. MANUAL CHECK: Did we get an image URL?
-    // If not, stop here. Do not let Mongoose handle it.
-    if (!body.image) {
-        return res.status(400).json({ message: "Course Image is required" });
+    // 4. PARSE FEATURES (Handle array or indexed fields)
+    let features = [];
+    if (req.body.features) {
+        // If it came as a JSON string or array
+        features = Array.isArray(req.body.features) ? req.body.features : [req.body.features];
+    } else {
+        // If it came as features[0], features[1] (FormData standard)
+        Object.keys(req.body).forEach((key) => {
+            const m = key.match(/^features\[(\d+)\]$/);
+            if (m) features[Number(m[1])] = req.body[key];
+        });
     }
+    // Remove empty/null values
+    features = features.filter(f => f);
 
-    // 4. Handle Features (Cleanup array)
-    if (!body.features) {
-      const features = [];
-      Object.keys(body).forEach((key) => {
-        const m = key.match(/^features\[(\d+)\]$/);
-        if (m) {
-          features[Number(m[1])] = body[key];
-          delete body[key];
-        }
-      });
-      if (features.length) body.features = features.filter(f => f);
-    }
+    // 5. MANUAL CONSTRUCTION ( The Fix for "Cast to String" )
+    // We do NOT use { ...req.body }. We pick fields manually.
+    const courseData = {
+        title: req.body.title,
+        slug: req.body.slug,
+        description: req.body.description,
+        category: req.body.category,
+        badgeText: req.body.badgeText,
+        colorTheme: req.body.colorTheme, // Mongoose handles the object structure if schema matches
+        features: features,
+        image: imageUrl, // <--- We force the string URL here
+        // Add createdBy if you have auth middleware
+        // createdBy: req.user?._id 
+    };
 
-    const course = new Course(body);
+    console.log("➡️ Saving Course to DB:", courseData);
+
+    const course = new Course(courseData);
     const createdCourse = await course.save();
+    
     res.status(201).json(createdCourse);
 
   } catch (error) {
-    console.error('Create Error:', error.message);
+    console.error("❌ Create Course Error:", error.message);
     res.status(400).json({ message: error.message });
   }
 };
-
 // @desc    Update a course
 // @route   PUT /api/courses/:id
 // @access  Private (Admin)
