@@ -2,20 +2,29 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure uploads directory exists
-if (!fs.existsSync('public/uploads/')) {
-  fs.mkdirSync('public/uploads/', { recursive: true });
-}
+// For serverless environments, use memory storage
+// For local development, use disk storage
+const storage = process.env.NODE_ENV === 'production' || !process.env.NODE_ENV || process.env.VERCEL
+  ? multer.memoryStorage()
+  : (() => {
+      // Try to create uploads directory for development
+      try {
+        if (!fs.existsSync('public/uploads/')) {
+          fs.mkdirSync('public/uploads/', { recursive: true });
+        }
+      } catch (err) {
+        console.warn('Could not create uploads directory:', err.message);
+      }
 
-// Use disk storage for all environments (needed for Cloudinary processing)
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, 'public/uploads/');
-  },
-  filename(req, file, cb) {
-    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-  },
-});
+      return multer.diskStorage({
+        destination(req, file, cb) {
+          cb(null, 'public/uploads/');
+        },
+        filename(req, file, cb) {
+          cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+        },
+      });
+    })();
 
 function checkFileType(file, cb) {
   const filetypes = /jpg|jpeg|png|pdf/;
