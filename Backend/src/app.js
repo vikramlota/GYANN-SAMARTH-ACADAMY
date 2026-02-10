@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const connectDB = require('./db/index.js');
+const connectDB = require('./db/index.js') || require('./db/index.js').default;
 
 const app = express()
 
