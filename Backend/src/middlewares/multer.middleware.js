@@ -1,38 +1,20 @@
 const multer = require('multer');
-const path = require('path');
 
-// Set storage engine
 const storage = multer.diskStorage({
-  destination: './public/uploads/', // Files will be saved here
-  filename: function(req, file, cb) {
-    // Generate unique filename: filename-timestamp.extension
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  destination: function (req, file, cb) {
+    // ON VERCEL: Use the system temp folder
+    // LOCALLY: Use your normal public/temp folder
+    if (process.env.VERCEL) {
+       cb(null, '/tmp'); 
+    } else {
+       cb(null, "./public/temp");
+    }
+  },
+  filename: function (req, file, cb) {
+    // Keep the unique filename logic
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
   }
 });
 
-// Check file type (Optional safety)
-function checkFileType(file, cb) {
-  // Allowed ext
-  const filetypes = /jpeg|jpg|png|gif|pdf/;
-  // Check ext
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  // Check mime
-  const mimetype = filetypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb('Error: Images and PDFs Only!');
-  }
-}
-
-// Init Upload
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5000000 }, // 5MB limit
-  fileFilter: function(req, file, cb) {
-    checkFileType(file, cb);
-  }
-});
-
-module.exports = upload;
+module.exports = multer({ storage });

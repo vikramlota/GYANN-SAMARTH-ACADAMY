@@ -10,43 +10,27 @@ cloudinary.config({
 
 const uploadOnCloudinary = async (localFilePath) => {
     try {
-        if (!localFilePath) {
-          console.warn('No file path provided to Cloudinary');
-          return null;
-        }
-        
-        // Upload the file on cloudinary
+        if (!localFilePath) return null;
+
+        // Upload to Cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: "auto"
         });
-        
-        console.log('File uploaded to Cloudinary:', response.secure_url);
-        
-        // Clean up temp file after successful upload
-        try {
-          if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath);
-          }
-        } catch (err) {
-          console.warn('Could not delete temp file:', err.message);
-        }
-        
+
+        // SUCCESS: File uploaded. Now remove local file.
+        // We use fs.unlinkSync because it works on both /tmp and ./public
+        fs.unlinkSync(localFilePath); 
         return response;
 
     } catch (error) {
-        console.error('Cloudinary upload error:', error.message);
-        
-        // Try to clean up temp file even on error
+        // ERROR: Remove the local file so /tmp doesn't fill up
+        // Wrap in try/catch in case file doesn't exist
         try {
-          if (fs.existsSync(localFilePath)) {
             fs.unlinkSync(localFilePath);
-          }
-        } catch (err) {
-          console.warn('Could not delete temp file after error:', err.message);
+        } catch (e) { 
+            console.log("Error deleting file:", e); 
         }
-        
-        throw new Error(`Cloudinary upload failed: ${error.message}`);
+        return null;
     }
 }
-
 module.exports = { uploadOnCloudinary };
