@@ -26,8 +26,6 @@ app.use(async (req, res, next) => {
 app.use(cors({
   origin: process.env.CORS_ORIGIN || "https://samarthacadam.vercel.app", 
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
 
 // Health check endpoint
