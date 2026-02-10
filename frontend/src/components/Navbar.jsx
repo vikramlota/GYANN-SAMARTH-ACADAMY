@@ -36,7 +36,7 @@ const Navbar = () => {
       <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           {/* Logo */}
-          <a href="" className="flex items-center group">
+          <a href="/" className="flex items-center group">
             {/* Replace src with your actual image path in public folder */}
             <img src="/images/purelogo.png" alt="Samarth Academy" className="w-14 h-14 object-contain group-hover:scale-105 transition-transform rounded-md" />
             <div className="ml-2 flex flex-col">
