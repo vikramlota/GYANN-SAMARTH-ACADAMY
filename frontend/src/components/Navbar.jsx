@@ -7,7 +7,7 @@ const Navbar = () => {
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   const navLinks = [
-    { name: 'Home', href: 'hero' },
+    { name: 'Home', href: '' },
     { name: 'Courses', href: 'courses' },
     { name: 'Results', href: 'selections' },
     { name: 'Notifications', href: 'notifications' },

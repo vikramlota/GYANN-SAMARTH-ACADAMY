@@ -12,7 +12,7 @@ const Footer = () => {
           
           {/* Col 1: Logo & Mission */}
           <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <a href="#hero" className="text-3xl font-extrabold text-brand-orange flex items-center mb-4 bg-white/10 p-2 rounded-lg w-max">
+            <a href=" " className="text-3xl font-extrabold text-brand-orange flex items-center mb-4 bg-white/10 p-2 rounded-lg w-max">
                 <span className="text-white">Samarth Academy</span>
             </a>
             <p className="text-sm mb-4 text-red-100 leading-relaxed">
