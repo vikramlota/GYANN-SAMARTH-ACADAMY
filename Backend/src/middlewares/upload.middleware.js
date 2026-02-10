@@ -1,30 +1,10 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
-// For serverless environments, use memory storage
-// For local development, use disk storage
-const storage = process.env.NODE_ENV === 'production' || !process.env.NODE_ENV || process.env.VERCEL
-  ? multer.memoryStorage()
-  : (() => {
-      // Try to create uploads directory for development
-      try {
-        if (!fs.existsSync('public/uploads/')) {
-          fs.mkdirSync('public/uploads/', { recursive: true });
-        }
-      } catch (err) {
-        console.warn('Could not create uploads directory:', err.message);
-      }
-
-      return multer.diskStorage({
-        destination(req, file, cb) {
-          cb(null, 'public/uploads/');
-        },
-        filename(req, file, cb) {
-          cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-        },
-      });
-    })();
+// Use memory storage for all file uploads
+// Files are handled as buffers and uploaded directly to Cloudinary
+// No local storage is used
+const storage = multer.memoryStorage();
 
 function checkFileType(file, cb) {
   const filetypes = /jpg|jpeg|png|pdf/;

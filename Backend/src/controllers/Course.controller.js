@@ -22,34 +22,30 @@ const createCourse = async (req, res) => {
   try {
     const body = { ...req.body };
 
-    // Handle image upload
+    // Handle image upload using Cloudinary
     if (req.file) {
-      const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-      
-      if (isProduction) {
-        // For serverless: convert buffer to temp file, upload to Cloudinary, then delete
-        if (req.file.buffer) {
-          tempFilePath = path.join('/tmp', `${Date.now()}-${req.file.originalname}`);
-          fs.writeFileSync(tempFilePath, req.file.buffer);
-          
-          const cloudinaryResponse = await uploadOnCloudinary(tempFilePath);
-          if (cloudinaryResponse && cloudinaryResponse.secure_url) {
-            body.image = cloudinaryResponse.secure_url;
-          } else {
-            throw new Error('Failed to upload image to Cloudinary');
-          }
-        } else if (req.file.path) {
-          // Disk storage fallback
-          const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
-          if (cloudinaryResponse && cloudinaryResponse.secure_url) {
-            body.image = cloudinaryResponse.secure_url;
-          } else {
-            throw new Error('Failed to upload image to Cloudinary');
+      try {
+        // Write buffer to temp file for Cloudinary upload
+        tempFilePath = path.join('/tmp', `${Date.now()}-${req.file.originalname}`);
+        fs.writeFileSync(tempFilePath, req.file.buffer);
+        
+        const cloudinaryResponse = await uploadOnCloudinary(tempFilePath);
+        if (cloudinaryResponse && cloudinaryResponse.secure_url) {
+          body.image = cloudinaryResponse.secure_url;
+          tempFilePath = null; // Already cleaned up by Cloudinary function
+        } else {
+          throw new Error('Cloudinary upload returned no URL');
+        }
+      } catch (uploadError) {
+        // Clean up temp file if still exists
+        if (tempFilePath && fs.existsSync(tempFilePath)) {
+          try {
+            fs.unlinkSync(tempFilePath);
+          } catch (err) {
+            console.error('Failed to delete temp file:', err.message);
           }
         }
-      } else {
-        // Use local uploads for development (disk storage)
-        body.image = `/uploads/${req.file.filename}`;
+        throw uploadError;
       }
     }
 
@@ -70,14 +66,15 @@ const createCourse = async (req, res) => {
     const createdCourse = await course.save();
     res.status(201).json(createdCourse);
   } catch (error) {
-    // Clean up temp file if it was created
-    if (tempFilePath) {
+    // Clean up temp file if still exists
+    if (tempFilePath && fs.existsSync(tempFilePath)) {
       try {
         fs.unlinkSync(tempFilePath);
       } catch (err) {
         console.error('Failed to delete temp file:', err.message);
       }
     }
+    console.error('Course creation error:', error.message);
     res.status(400).json({ message: error.message });
   }
 };

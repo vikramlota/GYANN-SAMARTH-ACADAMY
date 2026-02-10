@@ -13,19 +13,9 @@ const CoursesPage = () => {
        .finally(() => setLoading(false));
   }, []);
 
-  // Construct full image URL
+  // Get image URL - all images are from Cloudinary
   const getImageUrl = (course) => {
-    if (course.image) {
-      // If image is a relative path like /uploads/..., construct full URL
-      if (course.image.startsWith('/uploads/')) {
-        const apiBase = import.meta.env.VITE_API_URL || 'https://gyann-samarth-acadamy2.vercel.app/api';
-        const baseUrl = apiBase.replace('/api', '');
-        return `${baseUrl}${course.image}`;
-      }
-      // If it's already a full URL, return as is
-      return course.image;
-    }
-    return "https://placehold.co/400x250";
+    return course.image || "https://placehold.co/400x250";
   };
 
   if (loading) return <div className="text-center py-20">Loading Courses...</div>;
