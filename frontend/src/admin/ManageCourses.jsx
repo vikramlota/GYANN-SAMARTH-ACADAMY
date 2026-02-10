@@ -92,10 +92,11 @@ const ManageCourses = () => {
     if(fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // 1. Create FormData (This part is fine)
     const data = new FormData();
     data.append('title', formData.title);
     data.append('slug', formData.slug);
@@ -103,45 +104,54 @@ const ManageCourses = () => {
     data.append('category', formData.category);
     data.append('badgeText', formData.badgeText);
     
+    // Features loop
     formData.features.forEach((feat, index) => {
         data.append(`features[${index}]`, feat);
     });
 
+    // Theme logic
     let themeObj = { from: 'from-brand-red', to: 'to-orange-600', text: 'text-brand-red', border: 'border-brand-red' };
     if (formData.colorTheme === 'blue') {
         themeObj = { from: 'from-blue-600', to: 'to-cyan-500', text: 'text-blue-600', border: 'border-blue-600' };
     } else if (formData.colorTheme === 'green') {
         themeObj = { from: 'from-green-600', to: 'to-emerald-500', text: 'text-green-600', border: 'border-green-600' };
     }
-    
     data.append('colorTheme[from]', themeObj.from);
     data.append('colorTheme[to]', themeObj.to);
     data.append('colorTheme[text]', themeObj.text);
     data.append('colorTheme[border]', themeObj.border);
 
-    if (imageFile instanceof File) {
-      data.append('image', imageFile);
+    // 2. CRITICAL FIX: Ensure file is appended correctly
+    if (imageFile) {
+        data.append('image', imageFile);
     }
+
     try {
-      // --- NEW: Switch between POST (Create) and PUT (Update) ---
+      // 3. THE MAGIC FIX: Override the headers
+      // We set 'Content-Type' to undefined so the browser sets the "Boundary" automatically.
+      const config = {
+          headers: { 
+              "Content-Type": "multipart/form-data" 
+          }
+      };
+
       if (editingId) {
-        await api.put(`/courses/${editingId}`, data);
+        await api.put(`/courses/${editingId}`, data, config);
         alert('Course Updated Successfully!');
       } else {
-        await api.post('/courses', data);
+        await api.post('/courses', data, config);
         alert('Course Created Successfully!');
       }
       
       resetForm();
       fetchCourses();
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      alert('Operation failed. See console.');
+      console.error("Upload Error:", error.response?.data || error.message);
+      alert(`Failed: ${error.response?.data?.message || "Check console"}`);
     } finally {
       setIsSubmitting(false);
     }
   };
-
   const handleDelete = async (id) => {
     if(window.confirm("Are you sure?")) {
       try {
