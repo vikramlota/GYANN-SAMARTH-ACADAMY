@@ -1,26 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const connectDB = require('./db/index.js') || require('./db/index.js').default;
+const connectDB = require('./db/index.js');
 
 const app = express()
 
-// Initialize DB connection on first request to any route (don't block startup)
-let dbInitialized = false;
-
-app.use(async (req, res, next) => {
-  try {
-    // Only try to connect once per serverless function lifecycle
-    if (!dbInitialized) {
-      dbInitialized = true;
-      await connectDB();
-    }
-    next();
-  } catch (error) {
-    // Connection failed but continue anyway - health checks should still work
-    console.error("DB connection middleware error:", error);
-    next();
-  }
+// Connect to database on startup
+connectDB().catch((error) => {
+  console.error("Failed to connect to database:", error);
+  // For serverless, continue anyway - health checks should work
 });
 
 app.use(cors({

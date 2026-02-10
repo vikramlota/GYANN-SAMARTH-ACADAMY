@@ -1,14 +1,24 @@
-require('dotenv').config({ path: './.env' });
-const { app } = require('./app.js');
-const serverless = require('serverless-http');
+const dotenv = require("dotenv");
+const serverless = require("serverless-http");
+const connectDB = require("./db/index.js");
+const { app } = require("./app.js");
 
-// Export handler for Vercel serverless
-module.exports = serverless(app);
+dotenv.config({ path: "./.env" });
 
-// Local development server
-if (require.main === module) {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-        console.log(`⚙️  Server is running at port : ${PORT}`);
-    });
-}
+// Ensure DB connects once
+let isConnected = false;
+
+const connectDatabase = async () => {
+  if (!isConnected) {
+    await connectDB();
+    isConnected = true;
+    console.log("MongoDB Connected");
+  }
+};
+
+// Serverless handler
+module.exports.handler = async (event, context) => {
+  await connectDatabase();
+  const server = serverless(app);
+  return server(event, context);
+};  
