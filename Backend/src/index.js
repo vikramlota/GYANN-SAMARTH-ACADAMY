@@ -17,8 +17,12 @@ const connectDatabase = async () => {
 };
 
 // Serverless handler
-module.exports.handler = async (event, context) => {
+const handler = async (event, context) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   await connectDatabase();
   const server = serverless(app);
   return server(event, context);
-};  
+};
+
+module.exports = handler;
+module.exports.handler = handler;  
