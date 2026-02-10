@@ -8,6 +8,8 @@ const Hero = () => {
     { id: 1, title: 'Civil Services', badge: 'bg-brand-red', image: '/images/indian-civil-service.png' },
     { id: 2, title: 'Bank PO/Clerk', badge: 'bg-brand-orange', image: '/images/rbi-logo.jpg' }, // Update path
     { id: 3, title: 'Defence Forces', badge: 'bg-green-600', image: '/images/indian-army.jpg' }, // Update path
+    { id: 4, title: 'Police Reforms', badge: 'bg-green-600', image: '/images/indian-police.jpg' },
+    { id: 4, title: 'Police Reforms', badge: 'bg-green-600', image: '/images/indian-police.jpg' },
   ];
 
   useEffect(() => {
