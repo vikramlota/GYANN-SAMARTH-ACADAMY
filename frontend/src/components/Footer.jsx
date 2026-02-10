@@ -48,7 +48,7 @@ const Footer = () => {
                     {name: 'Selections', link: '#selections'},
                     {name: 'Schedule Demo', link: '#contact'},
                     {name: 'Exam Notification', link: '#updates'},
-                    {name: 'Testimonials', link: '#hero'} // Assuming hero/testimonials section
+                    {name: 'Testimonials', link: ''} // Assuming hero/testimonials section
                 ].map((item, i) => (
                     <li key={i}>
                         <a href={item.link} className="hover:text-white hover:translate-x-1 transition flex items-center">

@@ -20,7 +20,7 @@ const Hero = () => {
   }, [slides.length]);
 
   return (
-    <header id="hero" className="relative overflow-hidden bg-brand-red pt-16 pb-20 md:pt-24 md:pb-32">
+    <header id="" className="relative overflow-hidden bg-brand-red pt-16 pb-20 md:pt-24 md:pb-32">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-dot-pattern opacity-10"></div>
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
