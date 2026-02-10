@@ -7,7 +7,8 @@ const path = require('path');
 // @route   GET /api/courses
 const getCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ isActive: true });
+    // Sort by latest created
+    const courses = await Course.find({ isActive: true }).sort({ createdAt: -1 });
     res.json(courses);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -20,36 +21,40 @@ const getCourses = async (req, res) => {
 const createCourse = async (req, res) => {
   let tempFilePath = null;
   try {
+    // 1. Create a shallow copy of req.body
     const body = { ...req.body };
 
-    // Handle image upload using Cloudinary
+    // 2. Handle Image Upload
     if (req.file) {
       try {
-        // Write buffer to temp file for Cloudinary upload
-        tempFilePath = path.join('/tmp', `${Date.now()}-${req.file.originalname}`);
-        fs.writeFileSync(tempFilePath, req.file.buffer);
+        // VERCEL FIX: If multer didn't save to disk (memory storage), write to /tmp
+        if (req.file.buffer) {
+            tempFilePath = path.join('/tmp', `${Date.now()}-${req.file.originalname}`);
+            fs.writeFileSync(tempFilePath, req.file.buffer);
+        } else {
+            // Disk storage was used
+            tempFilePath = req.file.path;
+        }
         
         const cloudinaryResponse = await uploadOnCloudinary(tempFilePath);
+        
+        // CRITICAL: Extract ONLY the URL string
         if (cloudinaryResponse && cloudinaryResponse.secure_url) {
           body.image = cloudinaryResponse.secure_url;
-          tempFilePath = null; // Already cleaned up by Cloudinary function
         } else {
-          throw new Error('Cloudinary upload returned no URL');
+          throw new Error('Cloudinary upload failed to return a URL');
         }
       } catch (uploadError) {
-        // Clean up temp file if still exists
+        throw new Error(`Image upload failed: ${uploadError.message}`);
+      } finally {
+        // Clean up temp file
         if (tempFilePath && fs.existsSync(tempFilePath)) {
-          try {
-            fs.unlinkSync(tempFilePath);
-          } catch (err) {
-            console.error('Failed to delete temp file:', err.message);
-          }
+            try { fs.unlinkSync(tempFilePath); } catch (e) { console.error("Cleanup error", e); }
         }
-        throw uploadError;
       }
     }
 
-    // Normalize features if sent as features[0], features[1], ... from FormData
+    // 3. Handle Features (if sent as array items features[0], features[1]...)
     if (!body.features) {
       const features = [];
       Object.keys(body).forEach((key) => {
@@ -65,18 +70,81 @@ const createCourse = async (req, res) => {
     const course = new Course(body);
     const createdCourse = await course.save();
     res.status(201).json(createdCourse);
+
   } catch (error) {
-    // Clean up temp file if still exists
-    if (tempFilePath && fs.existsSync(tempFilePath)) {
-      try {
-        fs.unlinkSync(tempFilePath);
-      } catch (err) {
-        console.error('Failed to delete temp file:', err.message);
-      }
-    }
     console.error('Course creation error:', error.message);
     res.status(400).json({ message: error.message });
   }
+};
+
+// @desc    Update a course
+// @route   PUT /api/courses/:id
+// @access  Private (Admin)
+const updateCourse = async (req, res) => {
+    let tempFilePath = null;
+    try {
+        const { id } = req.params;
+        const course = await Course.findById(id);
+
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        const body = { ...req.body };
+
+        // 1. Handle New Image Upload (If provided)
+        if (req.file) {
+            try {
+                 if (req.file.buffer) {
+                    tempFilePath = path.join('/tmp', `${Date.now()}-${req.file.originalname}`);
+                    fs.writeFileSync(tempFilePath, req.file.buffer);
+                } else {
+                    tempFilePath = req.file.path;
+                }
+
+                const cloudinaryResponse = await uploadOnCloudinary(tempFilePath);
+
+                if (cloudinaryResponse && cloudinaryResponse.secure_url) {
+                    body.image = cloudinaryResponse.secure_url;
+                }
+            } catch (uploadError) {
+                 throw new Error(`Image upload failed: ${uploadError.message}`);
+            } finally {
+                if (tempFilePath && fs.existsSync(tempFilePath)) {
+                    try { fs.unlinkSync(tempFilePath); } catch (e) { console.error("Cleanup error", e); }
+                }
+            }
+        }
+
+        // 2. Handle Features Array Update
+        // If features are coming as separate fields (features[0], etc.)
+        const features = [];
+        Object.keys(body).forEach((key) => {
+            const m = key.match(/^features\[(\d+)\]$/);
+            if (m) {
+                features[Number(m[1])] = body[key];
+                delete body[key]; // Remove the raw key
+            }
+        });
+        
+        // If we extracted features, update the body
+        if (features.length > 0) {
+            body.features = features.filter(f => f !== undefined && f !== null);
+        }
+
+        // 3. Update the course
+        const updatedCourse = await Course.findByIdAndUpdate(
+            id,
+            { $set: body },
+            { new: true, runValidators: true } // Return the new document
+        );
+
+        res.json(updatedCourse);
+
+    } catch (error) {
+        console.error('Course update error:', error.message);
+        res.status(400).json({ message: error.message });
+    }
 };
 
 // @desc    Delete a course
@@ -96,4 +164,4 @@ const deleteCourse = async (req, res) => {
   }
 };
 
-module.exports = { getCourses, createCourse, deleteCourse };
+module.exports = { getCourses, createCourse, updateCourse, deleteCourse };

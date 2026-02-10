@@ -1,27 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
-import { FaTrash, FaPlus, FaBook, FaUpload, FaPalette, FaList } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaBook, FaUpload, FaPalette, FaList, FaEdit, FaTimes } from 'react-icons/fa';
 
 const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   
-  // Feature input state
+  // NEW: State to track which course we are editing
+  const [editingId, setEditingId] = useState(null);
+  
+  // Ref to clear file input manually
+  const fileInputRef = useRef(null);
+  
   const [currentFeature, setCurrentFeature] = useState('');
 
-  // Form State matches your Schema
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
     description: '',
     category: 'SSC',
-    badgeText: '', // e.g. "Bestseller"
-    colorTheme: 'red', // Simplified selector for UI
-    features: [] // Array of strings
+    badgeText: '',
+    colorTheme: 'red',
+    features: []
   });
 
-  // 1. Fetch Courses
   const fetchCourses = async () => {
     try {
       const { data } = await api.get('/courses');
@@ -31,12 +34,10 @@ const ManageCourses = () => {
 
   useEffect(() => { fetchCourses(); }, []);
 
-  // 2. Handle Text Changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Auto-generate slug from title
-    if (name === 'title') {
+    // Only auto-generate slug if NOT in edit mode (don't change existing slugs accidentally)
+    if (name === 'title' && !editingId) {
       const generatedSlug = value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
       setFormData({ ...formData, title: value, slug: generatedSlug });
     } else {
@@ -44,7 +45,6 @@ const ManageCourses = () => {
     }
   };
 
-  // 3. Feature List Logic
   const addFeature = () => {
     if (currentFeature.trim()) {
       setFormData({ ...formData, features: [...formData.features, currentFeature] });
@@ -57,7 +57,41 @@ const ManageCourses = () => {
     setFormData({ ...formData, features: newFeatures });
   };
 
-  // 4. Submit Form
+  // --- NEW: Handle Edit Click ---
+  const handleEdit = (course) => {
+    setEditingId(course._id);
+    
+    // Reverse-engineer the color theme string from the object for the UI
+    let themeString = 'red';
+    if (course.colorTheme?.text?.includes('blue')) themeString = 'blue';
+    if (course.colorTheme?.text?.includes('green')) themeString = 'green';
+
+    setFormData({
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        category: course.category,
+        badgeText: course.badgeText || '',
+        colorTheme: themeString,
+        features: course.features || []
+    });
+    
+    // Clear image file state (user has to upload new one if they want to change it)
+    setImageFile(null);
+    if(fileInputRef.current) fileInputRef.current.value = "";
+    
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // --- NEW: Cancel Edit ---
+  const resetForm = () => {
+    setEditingId(null);
+    setFormData({ title: '', slug: '', description: '', category: 'SSC', badgeText: '', colorTheme: 'red', features: [] });
+    setImageFile(null);
+    if(fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -69,22 +103,17 @@ const ManageCourses = () => {
     data.append('category', formData.category);
     data.append('badgeText', formData.badgeText);
     
-    // Send features as JSON string or individual items depending on backend
-    // Usually FormData sends arrays as 'features[0]', 'features[1]'
     formData.features.forEach((feat, index) => {
         data.append(`features[${index}]`, feat);
     });
 
-    // Handle Color Theme Logic (Mapping simple selection to complex object)
     let themeObj = { from: 'from-brand-red', to: 'to-orange-600', text: 'text-brand-red', border: 'border-brand-red' };
-    
     if (formData.colorTheme === 'blue') {
         themeObj = { from: 'from-blue-600', to: 'to-cyan-500', text: 'text-blue-600', border: 'border-blue-600' };
     } else if (formData.colorTheme === 'green') {
         themeObj = { from: 'from-green-600', to: 'to-emerald-500', text: 'text-green-600', border: 'border-green-600' };
     }
     
-    // Stringify nested objects for FormData
     data.append('colorTheme[from]', themeObj.from);
     data.append('colorTheme[to]', themeObj.to);
     data.append('colorTheme[text]', themeObj.text);
@@ -93,49 +122,70 @@ const ManageCourses = () => {
     if (imageFile) data.append('image', imageFile);
 
     try {
-      await api.post('/courses', data);
-      alert('Course Created Successfully!');
-      setFormData({ title: '', slug: '', description: '', category: 'SSC', badgeText: '', colorTheme: 'red', features: [] });
-      setImageFile(null);
+      // --- NEW: Switch between POST (Create) and PUT (Update) ---
+      if (editingId) {
+        await api.put(`/courses/${editingId}`, data);
+        alert('Course Updated Successfully!');
+      } else {
+        await api.post('/courses', data);
+        alert('Course Created Successfully!');
+      }
+      
+      resetForm();
       fetchCourses();
     } catch (error) {
-      console.error(error.response?.data || error.message || error);
-      alert('Failed to create course. See console for details.');
+      console.error(error.response?.data || error.message);
+      alert('Operation failed. See console.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if(window.confirm("Are you sure you want to delete this course?")) {
+    if(window.confirm("Are you sure?")) {
       try {
         await api.delete(`/courses/${id}`);
         setCourses(courses.filter(c => c._id !== id));
+        // If we deleted the course currently being edited, reset form
+        if (editingId === id) resetForm();
       } catch {
-        alert('Failed to delete course');
+        alert('Failed to delete');
       }
     }
   };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><FaBook className="text-brand-red"/> Manage Courses</h2>
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <FaBook className="text-brand-red"/> Manage Courses
+      </h2>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* --- LEFT: CREATE FORM --- */}
+        {/* --- LEFT: FORM (Create or Edit) --- */}
         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-fit sticky top-4">
-          <h3 className="font-bold text-lg mb-4 text-gray-800">Add New Course</h3>
+          <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-lg text-gray-800">
+                  {editingId ? 'Edit Course' : 'Add New Course'}
+              </h3>
+              {editingId && (
+                  <button onClick={resetForm} className="text-xs text-red-500 flex items-center gap-1 hover:underline">
+                      <FaTimes /> Cancel
+                  </button>
+              )}
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
-            
-            {/* Title & Slug */}
+            {/* Title */}
             <div>
                 <label className="text-xs font-bold text-gray-500 uppercase">Title</label>
-                <input name="title" value={formData.title} onChange={handleChange} placeholder="e.g. SSC CGL Mastery" required className="w-full border p-2 rounded focus:ring-2 focus:ring-brand-red outline-none" />
+                <input name="title" value={formData.title} onChange={handleChange} required className="w-full border p-2 rounded focus:ring-2 focus:ring-brand-red outline-none" />
             </div>
+            
+            {/* Slug */}
             <div>
-                <label className="text-xs font-bold text-gray-500 uppercase">Slug (Auto-generated)</label>
-                <input name="slug" value={formData.slug} onChange={handleChange} placeholder="ssc-cgl-mastery" required className="w-full border p-2 rounded bg-gray-50 text-sm" />
+                <label className="text-xs font-bold text-gray-500 uppercase">Slug</label>
+                <input name="slug" value={formData.slug} onChange={handleChange} required className="w-full border p-2 rounded bg-gray-50 text-sm" />
             </div>
 
             {/* Category & Badge */}
@@ -152,67 +202,71 @@ const ManageCourses = () => {
                     </select>
                 </div>
                 <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase">Badge (Optional)</label>
-                    <input name="badgeText" value={formData.badgeText} onChange={handleChange} placeholder="e.g. Bestseller" className="w-full border p-2 rounded" />
+                    <label className="text-xs font-bold text-gray-500 uppercase">Badge</label>
+                    <input name="badgeText" value={formData.badgeText} onChange={handleChange} className="w-full border p-2 rounded" />
                 </div>
             </div>
 
             {/* Description */}
             <div>
-                <label className="text-xs font-bold text-gray-500 uppercase">Description (Max 500)</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Brief details..." rows="3" maxLength="500" required className="w-full border p-2 rounded" />
+                <label className="text-xs font-bold text-gray-500 uppercase">Description</label>
+                <textarea name="description" value={formData.description} onChange={handleChange} rows="3" maxLength="500" required className="w-full border p-2 rounded" />
             </div>
 
             {/* Color Theme */}
             <div>
                 <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-2"><FaPalette/> Color Theme</label>
                 <div className="flex gap-4 mt-1">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="colorTheme" value="red" checked={formData.colorTheme === 'red'} onChange={handleChange} />
-                        <span className="w-4 h-4 rounded-full bg-red-500"></span> Red
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="colorTheme" value="blue" checked={formData.colorTheme === 'blue'} onChange={handleChange} />
-                        <span className="w-4 h-4 rounded-full bg-blue-500"></span> Blue
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="colorTheme" value="green" checked={formData.colorTheme === 'green'} onChange={handleChange} />
-                        <span className="w-4 h-4 rounded-full bg-green-500"></span> Green
-                    </label>
+                    {['red', 'blue', 'green'].map(color => (
+                        <label key={color} className="flex items-center gap-2 cursor-pointer capitalize">
+                            <input type="radio" name="colorTheme" value={color} checked={formData.colorTheme === color} onChange={handleChange} />
+                            <span className={`w-4 h-4 rounded-full bg-${color}-500`}></span> {color}
+                        </label>
+                    ))}
                 </div>
             </div>
 
-            {/* Features List */}
+            {/* Features */}
             <div>
-                <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-2"><FaList/> Key Features</label>
+                <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-2"><FaList/> Features</label>
                 <div className="flex gap-2 mt-1">
                     <input 
                         value={currentFeature} 
                         onChange={(e) => setCurrentFeature(e.target.value)} 
-                        placeholder="e.g. 100+ Live Classes" 
+                        placeholder="Add feature..." 
                         className="w-full border p-2 rounded text-sm"
                         onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                     />
                     <button type="button" onClick={addFeature} className="bg-gray-800 text-white px-3 rounded hover:bg-black"><FaPlus/></button>
                 </div>
-                {/* Feature Chips */}
                 <div className="flex flex-wrap gap-2 mt-2">
                     {formData.features.map((feat, idx) => (
-                        <span key={idx} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full flex items-center gap-1 border">
-                            {feat} <FaTrash className="cursor-pointer text-red-400 hover:text-red-600" onClick={() => removeFeature(idx)}/>
+                        <span key={idx} className="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1 border">
+                            {feat} <FaTrash className="cursor-pointer text-red-400" onClick={() => removeFeature(idx)}/>
                         </span>
                     ))}
                 </div>
             </div>
             
             {/* Image Upload */}
-            <div className="border border-dashed p-3 rounded flex items-center gap-2 hover:bg-gray-50 cursor-pointer">
-               <FaUpload className="text-gray-400"/>
-               <input type="file" onChange={(e) => setImageFile(e.target.files[0])} className="w-full text-sm" />
+            <div>
+                <label className="text-xs font-bold text-gray-500 uppercase block mb-1">
+                    {editingId ? 'Update Image (Optional)' : 'Course Image'}
+                </label>
+                <div className="border border-dashed p-3 rounded flex items-center gap-2 hover:bg-gray-50 cursor-pointer">
+                   <FaUpload className="text-gray-400"/>
+                   {/* Added ref to clear input after submit */}
+                   <input 
+                        ref={fileInputRef}
+                        type="file" 
+                        onChange={(e) => setImageFile(e.target.files[0])} 
+                        className="w-full text-sm" 
+                   />
+                </div>
             </div>
 
-            <button disabled={isSubmitting} className="w-full bg-brand-red text-white py-3 rounded-lg font-bold hover:bg-red-700 shadow-md transition disabled:bg-gray-400">
-               {isSubmitting ? 'Creating...' : 'Create Course'}
+            <button disabled={isSubmitting} className={`w-full text-white py-3 rounded-lg font-bold shadow-md transition disabled:bg-gray-400 ${editingId ? 'bg-blue-600 hover:bg-blue-700' : 'bg-brand-red hover:bg-red-700'}`}>
+               {isSubmitting ? 'Processing...' : (editingId ? 'Update Course' : 'Create Course')}
             </button>
           </form>
         </div>
@@ -221,13 +275,24 @@ const ManageCourses = () => {
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 h-fit">
            {courses.map(course => (
              <div key={course._id} className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition-all">
-                {/* Image Area */}
-                <div className="h-40 bg-gray-200 relative">
+                {/* Image */}
+                <div className="h-40 bg-gray-200 relative group">
                     {course.image ? (
                         <img src={course.image} alt={course.title} className="w-full h-full object-cover"/>
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold">No Image</div>
                     )}
+                    
+                    {/* NEW: Overlay Buttons */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        <button onClick={() => handleEdit(course)} className="bg-white text-blue-600 p-2 rounded-full hover:scale-110 transition shadow-lg">
+                            <FaEdit />
+                        </button>
+                        <button onClick={() => handleDelete(course._id)} className="bg-white text-red-500 p-2 rounded-full hover:scale-110 transition shadow-lg">
+                            <FaTrash />
+                        </button>
+                    </div>
+
                     {course.badgeText && (
                         <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded shadow text-black uppercase">
                             {course.badgeText}
@@ -235,24 +300,19 @@ const ManageCourses = () => {
                     )}
                 </div>
 
-                {/* Content Area */}
+                {/* Content */}
                 <div className="p-5 flex-grow">
                    <div className="flex justify-between items-start mb-2">
                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">{course.category}</span>
-                       <button onClick={() => handleDelete(course._id)} className="text-red-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition">
-                           <FaTrash/>
-                       </button>
                    </div>
                    
                    <h4 className={`text-xl font-bold mb-2 ${course.colorTheme?.text || 'text-gray-800'}`}>{course.title}</h4>
                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">{course.description}</p>
                    
-                   {/* Features Preview */}
                    <ul className="text-xs text-gray-500 space-y-1 mb-4">
                        {(course.features || []).slice(0, 3).map((feat, i) => (
                            <li key={i} className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span> {feat}</li>
                        ))}
-                       {(course.features || []).length > 3 && <li>+ {(course.features.length - 3)} more...</li>}
                    </ul>
                 </div>
              </div>
