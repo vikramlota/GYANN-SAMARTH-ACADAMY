@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 1. Use environment variable for API URL
-const rawUrl = import.meta.env.VITE_API_URL || 'https://thesamarthacademy.in/api';
+const rawUrl = import.meta.env.VITE_API_URL || ' https://gyann-samarth-acadamy2.vercel.app/api';
 const normalizedBase = rawUrl.endsWith('/api') ? rawUrl : rawUrl.replace(/\/+$/, '') + '/api';
 console.log('API baseURL:', normalizedBase);
 const api = axios.create({
