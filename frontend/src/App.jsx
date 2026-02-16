@@ -13,6 +13,7 @@ import UpdatesPage from './pages/Updates.jsx'; // List View for Updates
 import NotificationPage from './pages/Notification.jsx'; // Detail View for Updates
 import SelectionPage from './pages/Selections.jsx'; // Hall of Fame (Results)
 import CurrentAffairsPage from './pages/CurrentAffairsPage.jsx'; // New Page for Current Affairs
+import CourseDetailPage from './pages/CourseDetailpage.jsx'; // Detail View for Courses
 
 // --- Admin Pages ---
 import Login from './admin/Login';
@@ -47,7 +48,7 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:slug" element={<CoursesPage />} />
+          <Route path="/courses/:slug" element={<CourseDetailPage />} />
           
           {/* Updates & Notifications */}
           <Route path="/notifications" element={<UpdatesPage />} />
