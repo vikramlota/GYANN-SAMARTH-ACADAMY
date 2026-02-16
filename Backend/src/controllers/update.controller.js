@@ -40,6 +40,25 @@ const getUpdateById = async (req, res) => {
         const regexSlug = new RegExp(`^${param}$`, 'i');
         update = await Update.findOne({ slug: regexSlug });
       }
+
+      // If still not found, try to find by generating slug from title
+      // This handles cases where the slug wasn't generated yet
+      if (!update) {
+        // Search through all documents and find one whose generated slug matches
+        const allUpdates = await Update.find({});
+        for (const doc of allUpdates) {
+          const generatedSlug = generateSlug(doc.title);
+          if (generatedSlug === param) {
+            update = doc;
+            // Auto-save the generated slug to the document
+            if (!doc.slug) {
+              doc.slug = generatedSlug;
+              await doc.save();
+            }
+            break;
+          }
+        }
+      }
     }
 
     if (!update) {
