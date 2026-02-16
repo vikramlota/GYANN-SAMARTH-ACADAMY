@@ -14,18 +14,7 @@ const generateSlug = (title) => {
 // --- NOTIFICATIONS ---
 const getUpdates = async (req, res) => {
   try {
-    let updates = await Update.find({}).sort({ datePosted: -1 });
-    
-    // Auto-generate slugs for records that don't have them
-    for (const update of updates) {
-      if (!update.slug && update.title) {
-        update.slug = generateSlug(update.title);
-        await update.save();
-      }
-    }
-    
-    // Fetch again after auto-generation
-    updates = await Update.find({}).sort({ datePosted: -1 });
+    const updates = await Update.find({}).sort({ datePosted: -1 });
     res.json(updates);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -67,17 +56,14 @@ const createUpdate = async (req, res) => {
     const body = { ...req.body };
     if (req.file) body.imageUrl = `/uploads/${req.file.filename}`;
     
-    // Generate slug from title if not provided
-    if (body.title && !body.slug) {
-      body.slug = generateSlug(body.title);
-    }
-    
     // Normalize type enum values (accept lowercase from frontend)
     if (body.type && typeof body.type === 'string') {
       const map = { job: 'Job', admit: 'AdmitCard', result: 'Result', notice: 'Notice' };
       const low = body.type.toLowerCase();
       if (map[low]) body.type = map[low];
     }
+    
+    // The pre-save hook will automatically generate slug from title
     const update = await Update.create(body);
     res.status(201).json(update);
   } catch (error) {

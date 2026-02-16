@@ -47,11 +47,10 @@ const UpdateSchema = new mongoose.Schema({
 },{ timestamps: true });
 
 // Pre-save hook to auto-generate slug if not provided
-UpdateSchema.pre('save', function(next) {
+UpdateSchema.pre('save', async function() {
   if (this.title && !this.slug) {
     this.slug = generateSlug(this.title);
   }
-  next();
 });
 
 module.exports = mongoose.model('Update', UpdateSchema);
