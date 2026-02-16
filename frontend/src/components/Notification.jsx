@@ -16,7 +16,7 @@ const Notification = () => {
     const fetchUpdate = async () => {
       try {
         // Fetch specific update by slug
-        const response = await api.get(`/notification/${slug}`);
+        const response = await api.get(`/notification/${id}`);
         
         console.log("FETCHED DETAIL:", response.data); // Debugging
 
