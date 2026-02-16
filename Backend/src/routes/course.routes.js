@@ -26,5 +26,5 @@ router.route('/:id')
     .delete(protect, deleteCourse)
     .put(protect, upload.single('image'), updateCourse); // <--- Added Edit Route
 
-module.exports = router;
+    router.route('/:slug').get(getCourseBySlug);
 module.exports = router;

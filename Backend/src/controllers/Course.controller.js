@@ -249,5 +249,18 @@ const getCourseById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const getCourseBySlug = async (req, res) => {
+  try {
+    const course = await Course.findOne({ slug: req.params.slug });
+    if (course) {
+      res.json(course);
+    } else {
+      res.status(404).json({ message: 'Course not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-module.exports = { getCourses, getCourseById, createCourse, updateCourse, deleteCourse };
+module.exports = { getCourses, getCourseBySlug, createCourse, updateCourse, deleteCourse };
+
