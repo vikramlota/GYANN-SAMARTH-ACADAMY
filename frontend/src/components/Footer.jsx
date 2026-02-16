@@ -44,11 +44,10 @@ const Footer = () => {
             <h4 className="text-xl font-bold mb-4 text-brand-orange">QUICK LINKS</h4>
             <ul className="space-y-2 text-sm text-red-100">
                 {[
-                    {name: 'About Us', link: '#about'},
-                    {name: 'Selections', link: '#selections'},
+                    {name: 'Selections', link: '/Selections'},
                     {name: 'Schedule Demo', link: '#contact'},
-                    {name: 'Exam Notification', link: '#updates'},
-                    {name: 'Testimonials', link: ''} // Assuming hero/testimonials section
+                    {name: 'Exam Notification', link: '/notifications'},
+                    {name: 'Current Affairs', link: '/current-affairs'} // Assuming hero/testimonials section
                 ].map((item, i) => (
                     <li key={i}>
                         <a href={item.link} className="hover:text-white hover:translate-x-1 transition flex items-center">
