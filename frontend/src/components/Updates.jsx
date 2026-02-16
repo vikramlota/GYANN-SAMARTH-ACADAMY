@@ -52,10 +52,20 @@ const Updates = () => {
     }
   };
 
+  // Helper to generate slug if not present
+  const generateSlug = (title) => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  };
+
   // 1. Process data securely
   const updatesData = updates.map(update => ({
     id: update._id,
-    slug: update.slug,
+    slug: update.slug || generateSlug(update.title),
     type: update.type || 'other',
     date: update.datePosted 
       ? new Date(update.datePosted).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) 
