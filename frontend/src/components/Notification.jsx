@@ -7,37 +7,37 @@ import {
 } from 'react-icons/fa';
 
 const Notification = () => {
-  const { slug } = useParams(); // Grabs the slug from the URL
+  const { id } = useParams(); // Grabs the slug from the URL
   const [update, setUpdate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchUpdate = async () => {
-      try {
-        // Fetch specific update by slug
-        const response = await api.get(`/notifications/${slug}`);
-        
-        console.log("FETCHED DETAIL:", response.data); // Debugging
+    const fetchUpdate = async () => {
+      try {
+        // Fetch specific update by ID
+        const response = await api.get(`/notifications/${id}`);
+        
+        console.log("FETCHED DETAIL:", response.data); // Debugging
 
-        // ROBUST DATA HANDLING: Check if data is nested or direct
-        const data = response.data.data || response.data;
-        
-        if (data) {
-            setUpdate(data);
-        } else {
-            setError("Update not found.");
-        }
+        // ROBUST DATA HANDLING: Check if data is nested or direct
+        const data = response.data.data || response.data;
+        
+        if (data) {
+            setUpdate(data);
+        } else {
+            setError("Update not found.");
+        }
 
-      } catch (err) {
-        console.error("Error fetching update details:", err);
-        setError("Could not load update details. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUpdate();
-  }, [slug]);
+      } catch (err) {
+        console.error("Error fetching update details:", err);
+        setError("Could not load update details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUpdate();
+  }, [id]);
 
   // --- Share Functionality ---
   const shareNotification = () => {
