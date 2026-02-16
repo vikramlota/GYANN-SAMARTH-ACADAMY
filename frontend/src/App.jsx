@@ -50,7 +50,7 @@ function App() {
           
           {/* Updates & Notifications */}
           <Route path="/notifications" element={<UpdatesPage />} />
-          <Route path="/notifications/:id" element={<NotificationPage />} />
+          <Route path="/notifications/:slug" element={<NotificationPage />} />
           <Route path="/current-affairs" element={<CurrentAffairsPage />} />
           
           {/* Results / Hall of Fame */}

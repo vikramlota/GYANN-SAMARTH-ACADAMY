@@ -138,8 +138,8 @@ const Updates = () => {
                       <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.desc}</p>
                    </div>
                    <div className="shrink-0">
-                      {/* FIX: Link to the correct ID path */}
-                      <Link to={`/notifications/${item.id}`} className="inline-flex items-center justify-center w-full md:w-auto px-6 py-3 bg-red-50 text-brand-red font-bold rounded-xl border border-red-100 hover:bg-brand-red hover:text-white transition-all">
+                      {/* FIX: Link to the correct slug path */}
+                      <Link to={`/notifications/${item.slug}`} className="inline-flex items-center justify-center w-full md:w-auto px-6 py-3 bg-red-50 text-brand-red font-bold rounded-xl border border-red-100 hover:bg-brand-red hover:text-white transition-all">
                          View Details <FaArrowRight className="ml-2"/>
                       </Link>
                    </div>

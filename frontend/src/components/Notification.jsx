@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import api from '../utils/api'; 
+import api from '../utils/api'; // Use your configured API
 import { 
   FaArrowLeft, FaUniversity, FaPrint, FaCalendarAlt, 
   FaExternalLinkAlt, FaTag, FaWhatsapp, FaShare 
 } from 'react-icons/fa';
 
 const Notification = () => {
-  // CHANGED: Get 'slug' from URL instead of 'id'
-  const { slug } = useParams(); 
+  const { slug } = useParams(); // Grabs the slug from the URL
   const [update, setUpdate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,11 +15,12 @@ const Notification = () => {
   useEffect(() => {
     const fetchUpdate = async () => {
       try {
-        // CHANGED: Fetch by slug (Ensure your backend supports GET /notifications/:slug)
-        const response = await api.get(`/notifications/${slug}`);
+        // Fetch specific update by slug
+        const response = await api.get(`/notification/${slug}`);
         
-        console.log("FETCHED DETAIL:", response.data); 
+        console.log("FETCHED DETAIL:", response.data); // Debugging
 
+        // ROBUST DATA HANDLING: Check if data is nested or direct
         const data = response.data.data || response.data;
         
         if (data) {
@@ -36,14 +36,15 @@ const Notification = () => {
         setLoading(false);
       }
     };
-    if (slug) fetchUpdate();
+    fetchUpdate();
   }, [slug]);
 
+  // --- Share Functionality ---
   const shareNotification = () => {
     if (navigator.share) {
       navigator.share({
-        title: update?.title,
-        text: update?.description,
+        title: update.title,
+        text: update.description,
         url: window.location.href,
       });
     } else {
@@ -52,6 +53,7 @@ const Notification = () => {
     }
   };
 
+  // --- Loading State ---
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -63,6 +65,7 @@ const Notification = () => {
     );
   }
 
+  // --- Error State ---
   if (error || !update) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-600">
@@ -82,8 +85,7 @@ const Notification = () => {
           <Link to="/notifications" className="inline-flex items-center py-1 px-3 rounded-full bg-white/10 border border-white/20 text-brand-orange font-bold text-xs mb-4 tracking-wider uppercase hover:bg-white/20 transition-colors">
             <FaArrowLeft className="mr-1" /> Back to Updates
           </Link>
-          {/* Main Page Title */}
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 max-w-4xl mx-auto">{update.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-2 max-w-4xl mx-auto font-bold tracking-tight">{update.title}</h1>
           <p className="text-red-100 text-lg uppercase tracking-widest">{update.type || 'General'} UPDATE</p>
         </div>
       </header>
@@ -99,7 +101,7 @@ const Notification = () => {
                         <div className="bg-brand-red p-2 rounded-lg text-white"><FaUniversity className="text-lg md:text-xl"/></div>
                         <div>
                             <h2 className="text-white font-bold text-base md:text-lg leading-tight">Official Notification</h2>
-                            <p className="text-gray-400 text-[10px] md:text-xs">ID: {update._id}</p>
+                            <p className="text-gray-400 text-[10px] md:text-xs">Slug: {update?.slug}</p>
                         </div>
                     </div>
                     <button className="text-gray-400 hover:text-white transition-colors" onClick={() => window.print()}>
@@ -128,11 +130,6 @@ const Notification = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* NEW: Title inside Body (Bold as requested) */}
-                    <h2 className="text-2xl font-bold text-gray-900">
-                        {update.title}
-                    </h2>
 
                     {/* Description Text */}
                     <div className="prose max-w-none text-gray-800 text-lg whitespace-pre-line">

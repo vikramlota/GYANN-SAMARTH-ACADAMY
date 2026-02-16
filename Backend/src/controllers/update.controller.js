@@ -13,7 +13,18 @@ const getUpdates = async (req, res) => {
 
 const getUpdateById = async (req, res) => {
   try {
-    const update = await Update.findById(req.params.id);
+    const param = req.params.id;
+    let update;
+
+    // Check if param is a MongoDB ObjectId or a slug
+    if (param.match(/^[0-9a-fA-F]{24}$/)) {
+      // It's a valid MongoDB ObjectId
+      update = await Update.findById(param);
+    } else {
+      // It's a slug, search by slug field
+      update = await Update.findOne({ slug: param });
+    }
+
     if (!update) {
       return res.status(404).json({ message: 'Update not found' });
     }
