@@ -31,6 +31,11 @@ const CourseSchema = new mongoose.Schema({
     required: [true, 'Please add a description'],
     maxlength: 500
   },
+  link: {
+    type: String,
+    required: false,
+    default: null
+  },
   category: {
     type: String,
     enum: ['SSC', 'Banking', 'State', 'Defence', 'Teaching', 'Other'],

@@ -21,6 +21,7 @@ const ManageCourses = () => {
     description: '',
     category: 'SSC',
     badgeText: '',
+    link: '',
     colorTheme: 'red',
     features: []
   });
@@ -72,6 +73,7 @@ const ManageCourses = () => {
         description: course.description,
         category: course.category,
         badgeText: course.badgeText || '',
+        link: course.link || '',
         colorTheme: themeString,
         features: course.features || []
     });
@@ -87,7 +89,7 @@ const ManageCourses = () => {
   // --- NEW: Cancel Edit ---
   const resetForm = () => {
     setEditingId(null);
-    setFormData({ title: '', slug: '', description: '', category: 'SSC', badgeText: '', colorTheme: 'red', features: [] });
+    setFormData({ title: '', slug: '', description: '', category: 'SSC', badgeText: '', link: '', colorTheme: 'red', features: [] });
     setImageFile(null);
     if(fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -103,6 +105,7 @@ const ManageCourses = () => {
     data.append('description', formData.description);
     data.append('category', formData.category);
     data.append('badgeText', formData.badgeText);
+    data.append('link', formData.link || '');
     
     // Features loop
     formData.features.forEach((feat, index) => {
@@ -218,6 +221,19 @@ const ManageCourses = () => {
                 </div>
             </div>
 
+            {/* Link */}
+            <div>
+                <label className="text-xs font-bold text-gray-500 uppercase">Course Link (Optional)</label>
+                <input 
+                    type="url" 
+                    name="link" 
+                    value={formData.link} 
+                    onChange={handleChange} 
+                    placeholder="https://example.com/course" 
+                    className="w-full border p-2 rounded text-sm" 
+                />
+            </div>
+
             {/* Description */}
             <div>
                 <label className="text-xs font-bold text-gray-500 uppercase">Description</label>
@@ -319,6 +335,12 @@ const ManageCourses = () => {
                    
                    <h4 className={`text-xl font-bold mb-2 ${course.colorTheme?.text || 'text-gray-800'}`}>{course.title}</h4>
                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">{course.description}</p>
+                   
+                   {course.link && (
+                     <p className="text-xs text-blue-600 mb-3 truncate">
+                       🔗 <a href={course.link} target="_blank" rel="noopener noreferrer" className="hover:underline">{course.link}</a>
+                     </p>
+                   )}
                    
                    <ul className="text-xs text-gray-500 space-y-1 mb-4">
                        {(course.features || []).slice(0, 3).map((feat, i) => (
