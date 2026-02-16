@@ -21,7 +21,7 @@ const Footer = () => {
             <div className="flex space-x-3">
                 <a href="#" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaFacebookF /></a>
                 <a href="#" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaInstagram /></a>
-                <a href="https://wa.me/919988949969" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaWhatsapp /></a>
+                <a href="https://wa.me/919041973105" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaWhatsapp /></a>
             </div>
           </div>
 
@@ -63,6 +63,7 @@ const Footer = () => {
             <h4 className="text-xl font-bold mb-4 text-brand-orange">CONTACT INFO</h4>
             <address className="space-y-3 text-sm not-italic text-red-100">
                 <p className="flex items-center"><FaPhoneAlt className="mr-3 text-lg text-brand-orange" /> +91 99889 49969</p>
+                <p className="flex items-center"><FaWhatsapp className="mr-3 text-lg text-brand-orange" /> +91 90419 73105</p>
                 <p className="flex items-center"><FaEnvelope className="mr-3 text-lg text-brand-orange" /> samarth.academy2006@gmail.com</p>
                 <p className="flex items-start"><FaMapMarkerAlt className="mr-3 mt-1 text-lg text-brand-orange flex-shrink-0" /> SCF 68, UT MARKET, Opp. GNDU, AMRITSAR</p>
             </address>

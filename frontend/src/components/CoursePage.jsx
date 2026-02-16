@@ -1,14 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
+import { Link } from 'react-router-dom';
 import { FaClock, FaTag, FaBookOpen } from 'react-icons/fa';
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper to generate slug if not present
+  const generateSlug = (title) => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  };
+
   useEffect(() => {
     api.get('/courses')
-       .then(res => setCourses(res.data))
+       .then(res => {
+         // Add slug to each course if not present
+         const coursesWithSlugs = res.data.map(course => ({
+           ...course,
+           slug: course.slug || generateSlug(course.title)
+         }));
+         setCourses(coursesWithSlugs);
+       })
        .catch(err => console.error(err))
        .finally(() => setLoading(false));
   }, []);
@@ -36,9 +54,9 @@ const CoursesPage = () => {
                       <span className="flex items-center gap-1"><FaTag className="text-green-600"/> {course.price}</span>
                    </div>
                    <p className="text-gray-600 text-sm mb-6 line-clamp-2">{course.description}</p>
-                   <button className="w-full bg-brand-red text-white font-bold py-3 rounded-xl hover:bg-red-700 transition">
+                   <Link to={`/courses/${course.slug}`} className="w-full bg-brand-red text-white font-bold py-3 rounded-xl hover:bg-red-700 transition block text-center">
                       Enroll Now
-                   </button>
+                   </Link>
                 </div>
              </div>
            ))}

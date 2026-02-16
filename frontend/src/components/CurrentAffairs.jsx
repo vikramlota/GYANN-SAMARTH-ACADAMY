@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
+import { Link } from 'react-router-dom';
 import { FaCalendarAlt, FaSearch, FaTag, FaNewspaper } from 'react-icons/fa';
 
 const CurrentAffairs = () => {
@@ -7,6 +8,16 @@ const CurrentAffairs = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Helper to generate slug if not present
+  const generateSlug = (title) => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  };
 
   // Categories for filtering
   const categories = ['All', 'National', 'International', 'Sports', 'Science', 'Economy'];
@@ -16,8 +27,15 @@ const CurrentAffairs = () => {
       try {
         // Assuming your backend route is /api/current-affairs
         // If it is inside updates, change to /api/updates/current-affairs
-        const { data } = await api.get('/updates/current-affairs'); 
-        setNews(data);
+        const { data } = await api.get('/updates/current-affairs');
+        
+        // Add slug to each news item if not present
+        const newsWithSlugs = data.map(item => ({
+          ...item,
+          slug: item.slug || generateSlug(item.headline)
+        }));
+        
+        setNews(newsWithSlugs);
       } catch (error) {
         console.error("Error fetching news:", error);
       } finally {
@@ -112,9 +130,9 @@ const CurrentAffairs = () => {
                                 {item.contentBody || item.description}
                             </p>
 
-                            <button className="w-full mt-auto border border-blue-100 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors text-sm">
+                            <Link to={`/current-affairs/${item.slug}`} className="w-full mt-auto border border-blue-100 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors text-sm block text-center">
                                 Read Full Story
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 ))}

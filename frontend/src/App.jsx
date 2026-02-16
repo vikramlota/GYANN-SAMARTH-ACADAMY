@@ -47,11 +47,15 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:slug" element={<CoursesPage />} />
           
           {/* Updates & Notifications */}
           <Route path="/notifications" element={<UpdatesPage />} />
           <Route path="/notifications/:slug" element={<NotificationPage />} />
+          
+          {/* Current Affairs */}
           <Route path="/current-affairs" element={<CurrentAffairsPage />} />
+          <Route path="/current-affairs/:slug" element={<CurrentAffairsPage />} />
           
           {/* Results / Hall of Fame */}
           <Route path="/Selections" element={<SelectionPage  />} />

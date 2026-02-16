@@ -169,7 +169,7 @@ const Notification = () => {
                     </button>
 
                     {/* 3. WhatsApp Button */}
-                    <a href="https://wa.me/919988949969" target="_blank" rel="noreferrer"
+                    <a href="https://wa.me/919041973105" target="_blank" rel="noreferrer"
                        className="flex-1 bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow hover:bg-green-700 transition-all flex items-center justify-center">
                         <FaWhatsapp className="mr-2" /> Join Group
                     </a>

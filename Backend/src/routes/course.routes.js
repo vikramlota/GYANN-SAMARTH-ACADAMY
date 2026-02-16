@@ -3,7 +3,8 @@ const router = express.Router();
 
 // 1. Import updateCourse along with the others
 const { 
-    getCourses, 
+    getCourses,
+    getCourseById,
     createCourse, 
     deleteCourse, 
     updateCourse 
@@ -19,7 +20,9 @@ router.route('/')
     .post(protect, upload.single('image'), createCourse);
 
 // Private (Admin): Delete or Update a specific course
+// Public: Get a specific course by ID or Slug
 router.route('/:id')
+    .get(getCourseById)
     .delete(protect, deleteCourse)
     .put(protect, upload.single('image'), updateCourse); // <--- Added Edit Route
 

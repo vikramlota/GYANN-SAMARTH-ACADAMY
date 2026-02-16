@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { 
-  getCurrentAffairs, 
+  getCurrentAffairs,
+  getCurrentAffairById,
   createCurrentAffair, 
   deleteCurrentAffair,
   updateCurrentAffair // <--- Import this
@@ -11,6 +12,7 @@ const { protect } = require('../middlewares/auth.middleware.js');
 const upload = require('../middlewares/upload.middleware.js');
 
 router.get('/', getCurrentAffairs);
+router.get('/:id', getCurrentAffairById);
 router.post('/', protect, upload.single('image'), createCurrentAffair);
 router.delete('/:id', protect, deleteCurrentAffair);
 

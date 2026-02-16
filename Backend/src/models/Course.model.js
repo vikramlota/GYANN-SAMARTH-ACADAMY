@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+const generateSlug = (title) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+};
+
 const CourseSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -9,9 +18,9 @@ const CourseSchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
+    sparse: true
   },
   image: {
     type: String,
@@ -50,5 +59,12 @@ const CourseSchema = new mongoose.Schema({
     default: Date.now
   }
 }, { timestamps: true });
+
+// Pre-save hook to auto-generate slug if not provided
+CourseSchema.pre('save', async function() {
+  if (this.title && !this.slug) {
+    this.slug = generateSlug(this.title);
+  }
+});
 
 module.exports = mongoose.model('Course', CourseSchema);

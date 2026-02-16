@@ -3,6 +3,16 @@ const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 const fs = require('fs');
 const path = require('path');
 
+// --- UTILITY FUNCTION to generate slug ---
+const generateSlug = (title) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+};
+
 // @desc    Get all courses
 // @route   GET /api/courses
 const getCourses = async (req, res) => {
@@ -191,4 +201,53 @@ const deleteCourse = async (req, res) => {
   }
 };
 
-module.exports = { getCourses, createCourse, updateCourse, deleteCourse };
+// @desc    Get a single course by ID or Slug
+// @route   GET /api/courses/:id
+// @access  Public
+const getCourseById = async (req, res) => {
+  try {
+    const param = req.params.id;
+    let course;
+
+    // Check if param is a MongoDB ObjectId or a slug
+    if (param.match(/^[0-9a-fA-F]{24}$/)) {
+      // It's a valid MongoDB ObjectId
+      course = await Course.findById(param);
+    } else {
+      // It's a slug, search by slug field
+      course = await Course.findOne({ slug: param });
+      
+      // If slug not found, try case-insensitive
+      if (!course) {
+        const regexSlug = new RegExp(`^${param}$`, 'i');
+        course = await Course.findOne({ slug: regexSlug });
+      }
+
+      // If still not found, try to find by generating slug from title
+      if (!course) {
+        const allCourses = await Course.find({});
+        for (const doc of allCourses) {
+          const generatedSlug = generateSlug(doc.title);
+          if (generatedSlug === param) {
+            course = doc;
+            // Auto-save the generated slug to the document
+            if (!doc.slug) {
+              doc.slug = generatedSlug;
+              await doc.save();
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found', searchedParam: param });
+    }
+    res.json(course);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getCourses, getCourseById, createCourse, updateCourse, deleteCourse };
