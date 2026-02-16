@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom'; // 1. Import Link
 import { FaPhoneAlt, FaEnvelope, FaClock, FaFacebookF, FaInstagram, FaYoutube, FaBars, FaTimes } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation(); // Optional: used if you want to highlight the active link
 
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
+  // 2. Updated Paths to match App.js routes (start with /)
   const navLinks = [
-    { name: 'Home', href: '' },
-    { name: 'Courses', href: 'courses' },
-    { name: 'Results', href: 'selections' },
-    { name: 'Notifications', href: 'notifications' },
-    { name: 'Current Affairs', href: 'current-affairs' }
+    { name: 'Home', path: '/' },
+    { name: 'Courses', path: '/courses' },
+    { name: 'Results', path: '/selections' },
+    { name: 'Notifications', path: '/notifications' },
+    { name: 'Current Affairs', path: '/current-affairs' }
   ];
+
+  // Helper to check if link is active
+  const isActive = (path) => {
+    if (path === '/' && location.pathname !== '/') return false;
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <>
@@ -35,23 +44,30 @@ const Navbar = () => {
       {/* Main Nav */}
       <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          {/* Logo */}
-          <a href="/" className="flex items-center group">
+          
+          {/* Logo - Use Link for Home */}
+          <Link to="/" className="flex items-center group">
             {/* Replace src with your actual image path in public folder */}
             <img src="/images/purelogo.png" alt="Samarth Academy" className="w-14 h-14 object-contain group-hover:scale-105 transition-transform rounded-md" />
             <div className="ml-2 flex flex-col">
               <span className="text-2xl font-black text-gray-900 leading-none">SAMARTH</span>
               <span className="text-xs font-bold text-brand-red tracking-widest">ACADEMY</span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex space-x-8 items-center text-gray-700 font-semibold text-sm uppercase tracking-wide">
             {navLinks.map((link) => (
-              <a key={link.name} href={link.href} className="hover:text-brand-red transition relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-brand-red after:transition-all hover:after:w-full">
+              <Link 
+                key={link.name} 
+                to={link.path} 
+                className={`transition relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:bg-brand-red after:transition-all hover:after:w-full hover:text-brand-red
+                ${isActive(link.path) ? 'text-brand-red after:w-full' : 'after:w-0'}`}
+              >
                 {link.name}
-              </a>
+              </Link>
             ))}
+            {/* External/Anchor links usually stay as <a> tags */}
             <a href="#contact" className="bg-brand-red text-white py-2.5 px-6 rounded-full shadow-lg hover:bg-red-800 hover:shadow-xl transition-all transform hover:-translate-y-0.5">
               BOOK DEMO CLASS
             </a>
@@ -75,7 +91,13 @@ const Navbar = () => {
             <ul className="space-y-4 text-gray-800 font-bold text-lg">
               {navLinks.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} onClick={toggleMenu} className="block py-2 hover:text-brand-red border-b border-gray-100">{link.name}</a>
+                  <Link 
+                    to={link.path} 
+                    onClick={toggleMenu} 
+                    className={`block py-2 border-b border-gray-100 hover:text-brand-red ${isActive(link.path) ? 'text-brand-red pl-2 border-l-4 border-brand-red' : ''}`}
+                  >
+                    {link.name}
+                  </Link>
                 </li>
               ))}
             </ul>
