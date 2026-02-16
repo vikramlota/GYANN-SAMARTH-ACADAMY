@@ -6,6 +6,13 @@ const UpdateSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+    lowercase: true,
+    trim: true
+  },
   description: {
     type: String,
     required: true

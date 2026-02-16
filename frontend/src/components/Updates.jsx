@@ -55,6 +55,7 @@ const Updates = () => {
   // 1. Process data securely
   const updatesData = updates.map(update => ({
     id: update._id,
+    slug: update.slug,
     type: update.type || 'other',
     date: update.datePosted 
       ? new Date(update.datePosted).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) 

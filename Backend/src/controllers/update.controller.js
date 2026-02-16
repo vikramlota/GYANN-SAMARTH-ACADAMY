@@ -1,6 +1,16 @@
 const Update = require('../models/Update.model.js');
 const CurrentAffair = require('../models/CurrentAffair.model.js');
 
+// --- UTILITY FUNCTION to generate slug ---
+const generateSlug = (title) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+};
+
 // --- NOTIFICATIONS ---
 const getUpdates = async (req, res) => {
   try {
@@ -38,6 +48,12 @@ const createUpdate = async (req, res) => {
   try {
     const body = { ...req.body };
     if (req.file) body.imageUrl = `/uploads/${req.file.filename}`;
+    
+    // Generate slug from title if not provided
+    if (body.title && !body.slug) {
+      body.slug = generateSlug(body.title);
+    }
+    
     // Normalize type enum values (accept lowercase from frontend)
     if (body.type && typeof body.type === 'string') {
       const map = { job: 'Job', admit: 'AdmitCard', result: 'Result', notice: 'Notice' };
