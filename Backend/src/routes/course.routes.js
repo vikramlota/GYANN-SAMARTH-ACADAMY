@@ -4,7 +4,7 @@ const router = express.Router();
 // 1. Import updateCourse along with the others
 const { 
     getCourses,
-    getCourseById,
+    getCourseBySlug,
     createCourse, 
     deleteCourse, 
     updateCourse 
@@ -26,5 +26,5 @@ router.route('/:id')
     .delete(protect, deleteCourse)
     .put(protect, upload.single('image'), updateCourse); // <--- Added Edit Route
 
-    router.route('/:slug').get(getCourseBySlug);
+router.route('/:slug').get(getCourseBySlug);
 module.exports = router;
