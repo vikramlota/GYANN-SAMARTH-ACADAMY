@@ -14,7 +14,18 @@ const generateSlug = (title) => {
 // --- NOTIFICATIONS ---
 const getUpdates = async (req, res) => {
   try {
-    const updates = await Update.find({}).sort({ datePosted: -1 });
+    let updates = await Update.find({}).sort({ datePosted: -1 });
+    
+    // Auto-generate slugs for records that don't have them
+    for (const update of updates) {
+      if (!update.slug && update.title) {
+        update.slug = generateSlug(update.title);
+        await update.save();
+      }
+    }
+    
+    // Fetch again after auto-generation
+    updates = await Update.find({}).sort({ datePosted: -1 });
     res.json(updates);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -33,10 +44,17 @@ const getUpdateById = async (req, res) => {
     } else {
       // It's a slug, search by slug field
       update = await Update.findOne({ slug: param });
+      
+      // If slug not found and param looks like it might be a title slug attempt,
+      // try searching case-insensitively
+      if (!update) {
+        const regexSlug = new RegExp(`^${param}$`, 'i');
+        update = await Update.findOne({ slug: regexSlug });
+      }
     }
 
     if (!update) {
-      return res.status(404).json({ message: 'Update not found' });
+      return res.status(404).json({ message: 'Update not found', searchedParam: param });
     }
     res.json(update);
   } catch (error) {

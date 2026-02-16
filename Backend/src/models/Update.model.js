@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+const generateSlug = (title) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+};
+
 const UpdateSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -36,5 +45,13 @@ const UpdateSchema = new mongoose.Schema({
     default: Date.now
   }
 },{ timestamps: true });
+
+// Pre-save hook to auto-generate slug if not provided
+UpdateSchema.pre('save', function(next) {
+  if (this.title && !this.slug) {
+    this.slug = generateSlug(this.title);
+  }
+  next();
+});
 
 module.exports = mongoose.model('Update', UpdateSchema);

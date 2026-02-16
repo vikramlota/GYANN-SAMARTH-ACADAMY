@@ -16,12 +16,15 @@ const Notification = () => {
   useEffect(() => {
     const fetchUpdate = async () => {
       try {
+        console.log("Fetching with slug:", slug);
         // CHANGED: Fetch by slug (Ensure your backend supports GET /notifications/:slug)
         const response = await api.get(`/notifications/${slug}`);
         
+        console.log("API Response status:", response.status);
         console.log("FETCHED DETAIL:", response.data); 
 
         const data = response.data.data || response.data;
+        console.log("Processed data:", data);
         
         if (data) {
             setUpdate(data);
@@ -31,6 +34,7 @@ const Notification = () => {
 
       } catch (err) {
         console.error("Error fetching update details:", err);
+        console.error("Error response:", err.response);
         setError("Could not load update details. Please try again.");
       } finally {
         setLoading(false);
@@ -99,7 +103,7 @@ const Notification = () => {
                         <div className="bg-brand-red p-2 rounded-lg text-white"><FaUniversity className="text-lg md:text-xl"/></div>
                         <div>
                             <h2 className="text-white font-bold text-base md:text-lg leading-tight">Official Notification</h2>
-                            <p className="text-gray-400 text-[10px] md:text-xs">ID: {update._id}</p>
+                            <p className="text-gray-400 text-[10px] md:text-xs">Slug: {update?.slug}</p>
                         </div>
                     </div>
                     <button className="text-gray-400 hover:text-white transition-colors" onClick={() => window.print()}>
