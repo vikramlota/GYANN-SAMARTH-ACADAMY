@@ -12,21 +12,26 @@ const CurrentAffairsDetailPage = () => {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
+        console.log("🔍 Fetching article with slug:", slug);
         // Fetch specific current affair by slug
         const response = await api.get(`/current-affairs/${slug}`);
+        
+        console.log("✅ Article response:", response.data);
         
         // Handle nested data structures gracefully
         const data = response.data.data || response.data;
         const articleData = Array.isArray(data) ? data[0] : data;
 
         if (articleData) {
+            console.log("📄 Article data:", articleData);
             setArticle(articleData);
         } else {
+            console.error("❌ No article data found");
             setError("Article not found.");
         }
       } catch (err) {
-        console.error("Error fetching current affair:", err);
-        setError("Could not load the article. Please try again.");
+        console.error("❌ Error fetching current affair:", err.response?.data || err.message);
+        setError(err.response?.data?.message || "Could not load the article. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -38,8 +43,8 @@ const CurrentAffairsDetailPage = () => {
   const shareArticle = () => {
     if (navigator.share) {
       navigator.share({
-        title: article?.title,
-        text: `Read about ${article?.title} on Samarth Academy`,
+        title: article?.headline,
+        text: `Read about ${article?.headline} on Samarth Academy`,
         url: window.location.href,
       });
     } else {
@@ -86,7 +91,7 @@ const CurrentAffairsDetailPage = () => {
           </Link>
           
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight">
-            {article.title}
+            {article.headline}
           </h1>
           
           <div className="flex flex-wrap items-center justify-center gap-4 text-white/90 text-sm font-medium mt-6">
@@ -120,17 +125,18 @@ const CurrentAffairsDetailPage = () => {
             {/* Article Body */}
             <div className="p-6 md:p-10">
                 {/* Optional Image */}
-                {article.image && (
+                {article.imageUrl && (
                     <div className="mb-8 rounded-xl overflow-hidden shadow-md">
-                        <img src={article.image} alt={article.title} className="w-full h-auto max-h-[400px] object-cover" />
+                        <img src={article.imageUrl} alt={article.headline} className="w-full h-auto max-h-[400px] object-cover" />
                     </div>
                 )}
 
                 {/* Content Text */}
-<div 
-    className="prose max-w-none text-gray-800 text-lg leading-relaxed jodit-content"
-    dangerouslySetInnerHTML={{ __html: article.content || article.description }} 
-/>
+                <div 
+                    className="jodit-html-content text-gray-800 leading-relaxed space-y-4"
+                    dangerouslySetInnerHTML={{ __html: article.contentBody }} 
+                    style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}
+                />
             </div>
 
             {/* Footer Actions */}

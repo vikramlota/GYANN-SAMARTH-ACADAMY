@@ -1,14 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
+import JoditEditor from 'jodit-react';
 import { FaTrash, FaBell, FaUpload } from 'react-icons/fa';
 
 const ManageUpdates = () => {
   const [updates, setUpdates] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const editor = useRef(null);
+  
   const [formData, setFormData] = useState({
     title: '', description: '', type: 'job', linkUrl: '' , isLatest: true
   });
   const [imageFile, setImageFile] = useState(null);
+
+  // Jodit Editor Configuration
+  const editorConfig = {
+    readonly: false,
+    height: 300,
+    placeholder: 'Write notification details here...',
+    buttons: ['bold', 'italic', 'underline', '|', 'ul', 'ol', '|', 'font', 'fontsize', '|', 'align', '|', 'link', 'image', '|', 'fullsize']
+  };
 
   const fetchUpdates = async () => {
     try {
@@ -62,7 +73,17 @@ const ManageUpdates = () => {
                 <option value="result">Result Declared</option>
              </select>
 
-             <textarea name="description" value={formData.description} onChange={(e)=>setFormData({...formData, description:e.target.value})} placeholder="Details..." rows="3" className="w-full border p-2 rounded"/>
+             <div>
+               <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Description</label>
+               <JoditEditor
+                 ref={editor}
+                 value={formData.description}
+                 config={editorConfig}
+                 onBlur={(newContent) => setFormData({...formData, description: newContent})}
+                 onChange={(newContent) => {}}
+               />
+             </div>
+             
              <input name="linkUrl" value={formData.linkUrl} onChange={(e)=>setFormData({...formData, linkUrl:e.target.value})} placeholder="Official Link (Optional)" className="w-full border p-2 rounded"/>
              
              <div className="border border-dashed p-2 rounded">

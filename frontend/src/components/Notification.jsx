@@ -139,9 +139,11 @@ const Notification = () => {
                     </h2>
 
                     {/* Description Text */}
-                    <div className="prose max-w-none text-gray-800 text-lg whitespace-pre-line">
-                        {update.description}
-                    </div>
+                    <div 
+                        dangerouslySetInnerHTML={{ __html: update.description }}
+                        className="jodit-html-content text-gray-800 leading-relaxed space-y-4"
+                        style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}
+                    />
 
                     {/* Image Attachment (If exists) */}
                     {update.imageUrl && (

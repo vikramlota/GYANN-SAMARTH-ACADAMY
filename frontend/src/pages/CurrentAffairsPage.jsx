@@ -18,14 +18,16 @@ const CurrentAffairsPage = () => {
   // Otherwise, show the article detail
   useEffect(() => {
     setLoading(true);
+    console.log("🔍 Fetching article with slug:", slug);
     api.get(`/current-affairs/${slug}`)
        .then(res => {
+         console.log("✅ Article fetched:", res.data);
          setArticle(res.data);
          setError('');
        })
        .catch(err => {
-         console.error('Error fetching article:', err);
-         setError('Article not found');
+         console.error('❌ Error fetching article:', err.response?.data || err.message);
+         setError(err.response?.data?.message || 'Article not found');
        })
        .finally(() => setLoading(false));
   }, [slug]);
@@ -89,9 +91,11 @@ const CurrentAffairsPage = () => {
               </div>
             )}
 
-            <div className="prose max-w-none text-gray-800 text-lg leading-relaxed whitespace-pre-line">
-              {article.contentBody}
-            </div>
+            <div 
+              dangerouslySetInnerHTML={{ __html: article.contentBody }}
+              className="jodit-html-content text-gray-800 leading-relaxed mb-8 space-y-4"
+              style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}
+            />
           </div>
         </div>
       </div>
