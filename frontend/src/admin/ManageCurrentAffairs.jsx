@@ -131,10 +131,10 @@ const ManageCurrentAffairs = () => {
         <FaNewspaper className="text-blue-600"/> Manage Current Affairs
       </h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         
         {/* LEFT: Add/Edit Form */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-3">
             <div className={`bg-white p-6 rounded-xl shadow-lg border sticky top-4 ${editingId ? 'border-yellow-400 ring-2 ring-yellow-100' : 'border-gray-100'}`}>
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="font-bold text-lg">
