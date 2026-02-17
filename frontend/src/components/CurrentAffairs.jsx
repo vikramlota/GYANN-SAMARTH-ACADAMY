@@ -25,9 +25,8 @@ const CurrentAffairs = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        // Assuming your backend route is /api/current-affairs
-        // If it is inside updates, change to /api/updates/current-affairs
-        const { data } = await api.get('/updates/current-affairs');
+        // Backend route for current affairs
+        const { data } = await api.get('/current-affairs');
         
         // Add slug to each news item if not present
         const newsWithSlugs = data.map(item => ({

@@ -18,7 +18,7 @@ const CurrentAffairsPage = () => {
   // Otherwise, show the article detail
   useEffect(() => {
     setLoading(true);
-    api.get(`/updates/current-affairs/${slug}`)
+    api.get(`/current-affairs/${slug}`)
        .then(res => {
          setArticle(res.data);
          setError('');
