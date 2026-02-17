@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheckCircle, FaQuoteLeft, FaTrophy } from 'react-icons/fa';
+import { FaCheckCircle, FaQuoteLeft, FaTrophy, FaCalendarAlt } from 'react-icons/fa'; // Added FaCalendarAlt
 import { useScrollReveal } from '../hooks';
 import api from '../utils/api'; 
 
@@ -53,7 +53,7 @@ const Selections = () => {
             </div>
         )}
 
-        {/* Dynamic Detailed Grid (Changed to 3 columns for large cards) */}
+        {/* Dynamic Detailed Grid */}
         <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
             
            {!loading && students.length === 0 && (
@@ -104,6 +104,14 @@ const Selections = () => {
                 
                 {/* Testimonial / Detail Section */}
                 <div className="p-6 md:p-8 flex-grow flex flex-col bg-white">
+                    
+                    {/* NEW: Display the Year if it exists in your database */}
+                    {student.year && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 font-bold mb-4 bg-gray-50 w-max px-3 py-1.5 rounded-lg border border-gray-100">
+                            <FaCalendarAlt className="text-brand-orange" /> Selected in {student.year}
+                        </div>
+                    )}
+
                     {student.testimonial ? (
                         <div className="relative flex-grow">
                             <FaQuoteLeft className="absolute top-0 left-0 text-gray-100 text-4xl transform -translate-x-2 -translate-y-2" />
