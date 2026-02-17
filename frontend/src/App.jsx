@@ -17,6 +17,7 @@ import CourseDetailPage from './pages/CourseDetailpage.jsx'; // Detail View for 
 import BookDemoPage from './pages/BookDemoPage.jsx';
 // --- Admin Pages ---
 import Login from './admin/Login';
+import Dashboard from './admin/Dashboard.jsx';
 import ManageCourses from './admin/ManageCourses';
 import ManageUpdates from './admin/ManageUpdates';
 import ManageResults from './admin/ManageResults'; // For Hall of Fame
@@ -73,8 +74,7 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<div className="p-8 text-2xl font-bold">Welcome Admin</div>} />
-          
+          <Route path="dashboard" element={<Dashboard />} />
           {/* Management Pages */}
           <Route path="courses" element={<ManageCourses />} />
           <Route path="updates" element={<ManageUpdates />} />
