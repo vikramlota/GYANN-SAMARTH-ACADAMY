@@ -12,6 +12,11 @@ const uploadOnCloudinary = async (filePathOrBuffer, fileName = 'upload') => {
     try {
         if (!filePathOrBuffer) return null;
 
+        // Verify Cloudinary credentials
+        if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+            throw new Error('Missing Cloudinary credentials in environment variables');
+        }
+
         let response;
 
         // Check if it's a buffer (from memory storage)
@@ -21,8 +26,13 @@ const uploadOnCloudinary = async (filePathOrBuffer, fileName = 'upload') => {
                 const stream = cloudinary.uploader.upload_stream(
                     { resource_type: "auto" },
                     (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
+                        if (error) {
+                            console.error("❌ Cloudinary stream upload error:", error);
+                            reject(error);
+                        } else {
+                            console.log("✅ Cloudinary upload successful:", result.secure_url);
+                            resolve(result);
+                        }
                     }
                 );
                 Readable.from(filePathOrBuffer).pipe(stream);
@@ -44,8 +54,8 @@ const uploadOnCloudinary = async (filePathOrBuffer, fileName = 'upload') => {
         return response;
 
     } catch (error) {
-        console.error("Cloudinary upload error:", error);
-        return null;
+        console.error("❌ Cloudinary upload error:", error.message || error);
+        throw error; // Throw the error instead of returning null so the controller can handle it
     }
 }
 

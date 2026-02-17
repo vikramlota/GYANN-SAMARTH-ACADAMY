@@ -75,11 +75,25 @@ const createUpdate = async (req, res) => {
   try {
     const body = { ...req.body };
     
+    // Validate required fields
+    if (!body.title || !body.description || !body.type) {
+      return res.status(400).json({ 
+        message: "Missing required fields: title, description, type",
+        received: { title: !!body.title, description: !!body.description, type: !!body.type }
+      });
+    }
+    
     // Handle Image Upload to Cloudinary
     if (req.file) {
-      const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
-      if (uploadResult) {
-        body.imageUrl = uploadResult.url;
+      try {
+        const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+        if (uploadResult) {
+          body.imageUrl = uploadResult.url;
+          console.log("✅ Notification image uploaded to Cloudinary:", body.imageUrl);
+        }
+      } catch (uploadError) {
+        console.error("❌ Cloudinary upload error:", uploadError);
+        return res.status(400).json({ message: `Image upload failed: ${uploadError.message}` });
       }
     }
     
@@ -94,7 +108,8 @@ const createUpdate = async (req, res) => {
     const update = await Update.create(body);
     res.status(201).json(update);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("❌ Error creating notification:", error);
+    res.status(400).json({ message: error.message, details: error.toString() });
   }
 };
 

@@ -31,12 +31,28 @@ const createCurrentAffair = async (req, res) => {
   try {
     const { headline, contentBody, category, tags, isSpotlight } = req.body;
     
+    // Validate required fields
+    if (!headline || !contentBody || !category) {
+      return res.status(400).json({ 
+        message: "Missing required fields: headline, contentBody, category",
+        received: { headline: !!headline, contentBody: !!contentBody, category: !!category }
+      });
+    }
+    
     // 1. Handle Image Upload
     let imageUrl = '';
     if (req.file) {
-      const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
-      if (uploadResult) {
-        imageUrl = uploadResult.url;
+      try {
+        const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+        if (uploadResult) {
+          imageUrl = uploadResult.url;
+          console.log("✅ Image uploaded to Cloudinary:", imageUrl);
+        } else {
+          console.warn("⚠️ Cloudinary upload returned null");
+        }
+      } catch (uploadError) {
+        console.error("❌ Cloudinary upload error:", uploadError);
+        return res.status(400).json({ message: `Image upload failed: ${uploadError.message}` });
       }
     }
 
@@ -45,7 +61,7 @@ const createCurrentAffair = async (req, res) => {
     if (tags) {
       parsedTags = Array.isArray(tags) 
         ? tags 
-        : tags.split(',').map(tag => tag.trim());
+        : tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
     }
 
     // 3. Create Database Entry
@@ -60,8 +76,8 @@ const createCurrentAffair = async (req, res) => {
     
     res.status(201).json(newArticle);
   } catch (error) {
-    console.error("Error creating current affair:", error);
-    res.status(400).json({ message: error.message });
+    console.error("❌ Error creating current affair:", error);
+    res.status(400).json({ message: error.message, details: error.toString() });
   }
 };
 
