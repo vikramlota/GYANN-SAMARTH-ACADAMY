@@ -107,3 +107,23 @@ const Selections = () => {
                     {student.testimonial ? (
                         <div className="relative flex-grow">
                             <FaQuoteLeft className="absolute top-0 left-0 text-gray-100 text-4xl transform -translate-x-2 -translate-y-2" />
+                            <p className="text-gray-600 font-medium italic relative z-10 leading-relaxed pl-4 pt-2">
+                                "{student.testimonial}"
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="flex-grow flex items-center justify-center text-gray-400 italic text-sm">
+                            No testimonial provided.
+                        </div>
+                    )}
+                </div>
+
+             </div>
+           ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Selections;
