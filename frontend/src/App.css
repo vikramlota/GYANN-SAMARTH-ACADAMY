@@ -36,3 +36,16 @@
     font-family: var(--font-sans);
   }
 }
+/* Add to App.css to ensure Tailwind doesn't hide your Jodit tables */
+.jodit-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.jodit-content table, 
+.jodit-content th, 
+.jodit-content td {
+  border: 1px solid #d1d5db; /* Gray border */
+  padding: 8px;
+}

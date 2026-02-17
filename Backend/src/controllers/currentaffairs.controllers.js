@@ -127,57 +127,25 @@ const updateCurrentAffair = async (req, res) => {
 // @desc    Get a single current affair by ID or Slug
 // @route   GET /api/current-affairs/:id
 // @access  Public
-const getCurrentAffairById = async (req, res) => {
+
+
+const getCurrentAffairBySlug = async (req, res) => {
   try {
-    const param = req.params.id;
-    let affair;
-
-    // Check if param is a MongoDB ObjectId or a slug
-    if (param.match(/^[0-9a-fA-F]{24}$/)) {
-      // It's a valid MongoDB ObjectId
-      affair = await CurrentAffair.findById(param);
+    const article = await CurrentAffair.findOne({ slug: req.params.slug });
+    if (article) {
+      res.json(article);
     } else {
-      // It's a slug, search by slug field
-      affair = await CurrentAffair.findOne({ slug: param });
-      
-      // If slug not found, try case-insensitive
-      if (!affair) {
-        const regexSlug = new RegExp(`^${param}$`, 'i');
-        affair = await CurrentAffair.findOne({ slug: regexSlug });
-      }
-
-      // If still not found, try to find by generating slug from headline
-      if (!affair) {
-        const allAffairs = await CurrentAffair.find({});
-        for (const doc of allAffairs) {
-          const generatedSlug = generateSlug(doc.headline);
-          if (generatedSlug === param) {
-            affair = doc;
-            // Auto-save the generated slug to the document
-            if (!doc.slug) {
-              doc.slug = generatedSlug;
-              await doc.save();
-            }
-            break;
-          }
-        }
-      }
+      res.status(404).json({ message: 'Article not found' });
     }
-
-    if (!affair) {
-      return res.status(404).json({ message: 'Current Affair not found', searchedParam: param });
-    }
-    res.json(affair);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 // Don't forget to export it!
 module.exports = {
   getCurrentAffairs,
-  getCurrentAffairById,
+  getCurrentAffairBySlug,
   createCurrentAffair,
   deleteCurrentAffair,
-  updateCurrentAffair // <--- Add this
+  updateCurrentAffair // <--- Add
 };

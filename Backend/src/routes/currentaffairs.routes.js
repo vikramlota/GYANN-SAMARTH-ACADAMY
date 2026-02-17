@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { 
   getCurrentAffairs,
-  getCurrentAffairById,
+  getCurrentAffairBySlug,
   createCurrentAffair, 
   deleteCurrentAffair,
   updateCurrentAffair // <--- Import this
@@ -12,7 +12,7 @@ const { protect } = require('../middlewares/auth.middleware.js');
 const upload = require('../middlewares/upload.middleware.js');
 
 router.get('/', getCurrentAffairs);
-router.get('/:id', getCurrentAffairById);
+router.get('/:slug', getCurrentAffairBySlug); // <-- Change this line to use slug instead of ID
 router.post('/', protect, upload.single('image'), createCurrentAffair);
 router.delete('/:id', protect, deleteCurrentAffair);
 

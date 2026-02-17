@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
+import JoditEditor from 'jodit-react';
 import { FaTrash, FaEdit, FaNewspaper, FaUpload, FaTimes } from 'react-icons/fa';
 
 const ManageCurrentAffairs = () => {
   const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const editor = useRef(null); // Reference for Jodit Editor
   
   // State to track if we are editing
   const [editingId, setEditingId] = useState(null);
@@ -19,6 +22,20 @@ const ManageCurrentAffairs = () => {
     tags: '',
     isSpotlight: 'false'
   });
+
+  // Jodit Editor Configuration
+  const editorConfig = {
+    readonly: false,
+    height: 400,
+    placeholder: 'Write your current affairs update here...',
+    buttons: [
+      'bold', 'italic', 'underline', 'strikethrough', '|',
+      'ul', 'ol', '|',
+      'font', 'fontsize', 'brush', 'paragraph', '|',
+      'table', 'link', 'image', '|', // Includes the table tool
+      'align', 'undo', 'redo', 'source'
+    ]
+  };
 
   // 1. Fetch News
   const fetchNews = async () => {
@@ -170,15 +187,16 @@ const ManageCurrentAffairs = () => {
                         />
                     </div>
 
+                    {/* JODIT RICH TEXT EDITOR */}
                     <div>
-                        <label className="text-xs font-bold text-gray-500 uppercase">Content</label>
-                        <textarea 
-                            rows="6"
-                            className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" 
+                        <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Content</label>
+                        <JoditEditor
+                            ref={editor}
                             value={formData.contentBody}
-                            onChange={(e) => setFormData({...formData, contentBody: e.target.value})}
-                            required
-                        ></textarea>
+                            config={editorConfig}
+                            onBlur={(newContent) => setFormData({...formData, contentBody: newContent})}
+                            onChange={(newContent) => {}} // Dummy onChange to prevent re-rendering on every keystroke
+                        />
                     </div>
 
                     <div>
@@ -210,10 +228,10 @@ const ManageCurrentAffairs = () => {
                                     alt="thumb" 
                                     className="w-full sm:w-24 h-24 object-cover rounded-lg flex-shrink-0"
                                 />
-                                <div className="flex-grow">
+                                <div className="flex-grow overflow-hidden">
                                     <div className="flex justify-between items-start">
-                                        <h4 className="font-bold text-gray-900 line-clamp-2">{item.headline}</h4>
-                                        <div className="flex gap-2">
+                                        <h4 className="font-bold text-gray-900 line-clamp-2 pr-2">{item.headline}</h4>
+                                        <div className="flex gap-2 flex-shrink-0">
                                             <button 
                                                 onClick={() => handleEdit(item)} 
                                                 className="text-blue-500 hover:text-blue-700 p-2 bg-blue-50 rounded hover:bg-blue-100 transition"
@@ -238,7 +256,10 @@ const ManageCurrentAffairs = () => {
                                             <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Spotlight</span>
                                         )}
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-2 line-clamp-2">{item.contentBody}</p>
+                                    {/* Strip HTML tags for the preview text so it looks clean */}
+                                    <p className="text-xs text-gray-500 mt-2 line-clamp-2">
+                                        {item.contentBody?.replace(/<[^>]+>/g, '')}
+                                    </p>
                                 </div>
                             </div>
                         ))}
