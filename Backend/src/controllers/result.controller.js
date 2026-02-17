@@ -1,4 +1,5 @@
 const SuccessStory = require('../models/SuccessStory.model.js');
+const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 
 // @desc    Get all results
 // @route   GET /api/results
@@ -14,7 +15,15 @@ const addResult = async (req, res) => {
   try {
     const body = { ...req.body };
     if (req.file) {
-      body.imageUrl = `/uploads/${req.file.filename}`;
+      try {
+        const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+        if (uploadResult && (uploadResult.secure_url || uploadResult.url)) {
+          body.imageUrl = uploadResult.secure_url || uploadResult.url;
+        }
+      } catch (uploadErr) {
+        console.error('❌ Cloudinary upload failed for result image:', uploadErr);
+        return res.status(400).json({ message: 'Image upload failed', details: uploadErr.message });
+      }
     }
     const result = await SuccessStory.create(body);
     res.status(201).json(result);
