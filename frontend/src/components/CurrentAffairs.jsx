@@ -125,9 +125,9 @@ const CurrentAffairs = () => {
                                 {item.headline}
                             </h3>
                             
-                            <p className="text-gray-600 text-sm line-clamp-4 mb-4 flex-grow">
+                            {/* <p className="text-gray-600 text-sm line-clamp-4 mb-4 flex-grow">
                                 {item.contentBody || item.description}
-                            </p>
+                            </p> */}
 
                             <Link to={`/current-affairs/${item.slug}`} className="w-full mt-auto border border-blue-100 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors text-sm block text-center">
                                 Read Full Story
