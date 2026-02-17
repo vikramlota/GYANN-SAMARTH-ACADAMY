@@ -29,7 +29,7 @@ const CourseSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Please add a description'],
-    maxlength: 500
+    maxlength: 2000
   },
   link: {
     type: String,

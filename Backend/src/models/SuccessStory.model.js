@@ -11,7 +11,7 @@ const SuccessStorySchema = new mongoose.Schema({
   },
   rank: {
     type: String,
-    required: [true, 'Please add rank or status (e.g., AIR 1, Selected)']
+    required: false
   },
   category: {
     type: String,
@@ -28,7 +28,7 @@ const SuccessStorySchema = new mongoose.Schema({
   },
   testimonial: {
     type: String,
-    maxlength: 200
+    maxlength: 1000
   }
 },{ timestamps: true });
 
