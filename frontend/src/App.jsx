@@ -14,7 +14,7 @@ import NotificationPage from './pages/Notification.jsx'; // Detail View for Upda
 import SelectionPage from './pages/Selections.jsx'; // Hall of Fame (Results)
 import CurrentAffairsPage from './pages/CurrentAffairsPage.jsx'; // New Page for Current Affairs
 import CourseDetailPage from './pages/CourseDetailpage.jsx'; // Detail View for Courses
-
+import BookDemo from './pages/BookDemoPage.jsx';
 // --- Admin Pages ---
 import Login from './admin/Login';
 import ManageCourses from './admin/ManageCourses';
@@ -59,7 +59,9 @@ function App() {
           <Route path="/current-affairs/:slug" element={<CurrentAffairsPage />} />
           
           {/* Results / Hall of Fame */}
+          <Route path="/book-demo" element={<BookDemo />} />
           <Route path="/Selections" element={<SelectionPage  />} />
+        
         </Route>
 
         {/* ADMIN ROUTES */}
@@ -78,6 +80,8 @@ function App() {
           <Route path="updates" element={<ManageUpdates />} />
           <Route path="results" element={<ManageResults />} />
           <Route path="current-affairs" element={<ManageCurrentAffairs />} />
+          <Route path="demo-requests" element={<ManageDemoRequests />} />
+        
         </Route>
 
       </Routes>

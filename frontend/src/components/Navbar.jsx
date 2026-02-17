@@ -102,9 +102,7 @@ const Navbar = () => {
               ))}
             </ul>
             <div className="mt-auto">
-              <a href="#contact" onClick={toggleMenu} className="block text-center bg-brand-orange text-white font-bold py-4 rounded-xl shadow-lg hover:bg-orange-600 transition">
-                BOOK DEMO CLASS
-              </a>
+              <Link to="/book-demo" className="...">BOOK DEMO CLASS</Link>
             </div>
           </div>
         </div>

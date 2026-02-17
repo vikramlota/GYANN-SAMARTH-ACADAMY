@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const connectDB = require('./db/index.js');
-
+const demoRoutes = require('./routes/demo.routes.js');
 const app = express()
 
 // Connect to database on startup
@@ -36,7 +36,7 @@ app.use('/api/results', require('./routes/result.routes.js'));
 app.use('/api/notifications', require('./routes/update.routes.js'));
 app.use('/api/leads', require('./routes/lead.routes.js'));
 app.use('/api/current-affairs', require('./routes/currentaffairs.routes.js'));
-
+app.use("/api/demo-requests", demoRoutes);
 // Global error handler - catches any unhandled errors
 app.use((err, req, res, next) => {
   console.error('🔴 ERROR:', err);
