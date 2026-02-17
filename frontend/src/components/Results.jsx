@@ -58,7 +58,7 @@ const Results = () => {
                         <div className="absolute top-0 right-0 w-20 h-20 bg-brand-red rounded-full filter blur-xl opacity-20 group-hover:opacity-40 transition"></div>
                         <h4 className="font-bold mb-2 relative z-10">Be The Next Topper!</h4>
                         <p className="text-xs text-gray-400 mb-4 relative z-10">Join our upcoming batch.</p>
-                        <a href="#contact" className="block w-full bg-white text-gray-900 font-bold py-2 rounded-lg text-sm hover:bg-gray-100 transition text-center relative z-10">Enquire Now</a>
+                        <a href="/book-demo" className="block w-full bg-white text-gray-900 font-bold py-2 rounded-lg text-sm hover:bg-gray-100 transition text-center relative z-10">Enquire Now</a>
                     </div>
                 </div>
             </div>

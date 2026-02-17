@@ -61,7 +61,7 @@ const WhyUs = () => {
               <div className="relative z-10">
                 <h3 className="text-xl font-bold mb-1">Study Kit</h3>
                 <p className="text-white/90 text-xs mb-3">Curated notes & books.</p>
-                <a href="#contact" className="inline-flex items-center justify-center bg-white text-brand-orange px-3 py-1.5 rounded-lg text-xs font-bold shadow-md hover:bg-orange-50 transition">
+                <a href="/book-demo" className="inline-flex items-center justify-center bg-white text-brand-orange px-3 py-1.5 rounded-lg text-xs font-bold shadow-md hover:bg-orange-50 transition">
                     Get Sample <FaDownload className="ml-2" />
                 </a>
               </div>

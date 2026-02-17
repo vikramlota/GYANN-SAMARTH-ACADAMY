@@ -68,7 +68,7 @@ const Navbar = () => {
               </Link>
             ))}
             {/* External/Anchor links usually stay as <a> tags */}
-            <a href="#contact" className="bg-brand-red text-white py-2.5 px-6 rounded-full shadow-lg hover:bg-red-800 hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+            <a href="/book-demo" className="bg-brand-red text-white py-2.5 px-6 rounded-full shadow-lg hover:bg-red-800 hover:shadow-xl transition-all transform hover:-translate-y-0.5">
               BOOK DEMO CLASS
             </a>
           </div>

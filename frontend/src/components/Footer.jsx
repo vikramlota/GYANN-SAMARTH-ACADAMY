@@ -70,12 +70,12 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-red-100">
                 {[
                     {name: 'Selections', link: '/selections'}, // Made lowercase to match App.js
-                    {name: 'Schedule Demo', link: '#contact'},
+                    {name: 'Schedule Demo', link: '/book-demo'},
                     {name: 'Exam Notification', link: '/notifications'},
                     {name: 'Current Affairs', link: '/current-affairs'} 
                 ].map((item, i) => (
                     <li key={i}>
-                        {/* Use normal <a> tag if it's an anchor link (#contact), otherwise use <Link> */}
+                        {/* Use normal <a> tag if it's an anchor link (/book-demo), otherwise use <Link> */}
                         {item.link.startsWith('#') ? (
                            <a href={item.link} className="hover:text-white hover:translate-x-1 transition flex items-center">
                                <FaChevronRight className="mr-2 text-brand-orange text-xs" /> {item.name}

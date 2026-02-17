@@ -40,7 +40,7 @@ const Hero = () => {
             Master Banking, SSC, and State exams with Samarth Academy's proven pedagogy and expert mentorship.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <a href="#contact" className="px-8 py-4 bg-white text-brand-red font-bold rounded-xl shadow-lg hover:-translate-y-1 transition-all text-center">
+            <a href="/book-demo" className="px-8 py-4 bg-white text-brand-red font-bold rounded-xl shadow-lg hover:-translate-y-1 transition-all text-center">
               Start Learning
             </a>
             <a href="tel:+919988949969" className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition-all text-center flex items-center justify-center gap-2">
