@@ -43,6 +43,10 @@ const UpdateSchema = new mongoose.Schema({
   datePosted: {
     type: Date,
     default: Date.now
+  },
+  imageUrl: {
+    type: String,
+    required: false
   }
 },{ timestamps: true });
 

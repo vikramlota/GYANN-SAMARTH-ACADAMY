@@ -1,5 +1,6 @@
 const Update = require('../models/Update.model.js');
 const CurrentAffair = require('../models/CurrentAffair.model.js');
+const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 
 // --- UTILITY FUNCTION to generate slug ---
 const generateSlug = (title) => {
@@ -73,7 +74,14 @@ const getUpdateById = async (req, res) => {
 const createUpdate = async (req, res) => {
   try {
     const body = { ...req.body };
-    if (req.file) body.imageUrl = `/uploads/${req.file.filename}`;
+    
+    // Handle Image Upload to Cloudinary
+    if (req.file) {
+      const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+      if (uploadResult) {
+        body.imageUrl = uploadResult.url;
+      }
+    }
     
     // Normalize type enum values (accept lowercase from frontend)
     if (body.type && typeof body.type === 'string') {
@@ -112,7 +120,15 @@ const getCurrentAffairs = async (req, res) => {
 const createCurrentAffair = async (req, res) => {
   try {
     const body = { ...req.body };
-    if (req.file) body.imageUrl = `/uploads/${req.file.filename}`;
+    
+    // Handle Image Upload to Cloudinary
+    if (req.file) {
+      const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+      if (uploadResult) {
+        body.imageUrl = uploadResult.url;
+      }
+    }
+    
     const news = await CurrentAffair.create(body);
     res.status(201).json(news);
   } catch (error) {
