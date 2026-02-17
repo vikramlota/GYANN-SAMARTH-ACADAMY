@@ -1,6 +1,6 @@
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
-
+const { Readable } = require('stream');
 
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -8,29 +8,45 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (filePathOrBuffer, fileName = 'upload') => {
     try {
-        if (!localFilePath) return null;
+        if (!filePathOrBuffer) return null;
 
-        // Upload to Cloudinary
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto"
-        });
+        let response;
 
-        // SUCCESS: File uploaded. Now remove local file.
-        // We use fs.unlinkSync because it works on both /tmp and ./public
-        fs.unlinkSync(localFilePath); 
+        // Check if it's a buffer (from memory storage)
+        if (Buffer.isBuffer(filePathOrBuffer)) {
+            // Upload buffer as stream to Cloudinary
+            response = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { resource_type: "auto" },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                Readable.from(filePathOrBuffer).pipe(stream);
+            });
+        } else {
+            // It's a file path string (from disk storage)
+            response = await cloudinary.uploader.upload(filePathOrBuffer, {
+                resource_type: "auto"
+            });
+
+            // Remove local file if it exists
+            try {
+                fs.unlinkSync(filePathOrBuffer);
+            } catch (e) {
+                console.log("Error deleting local file:", e);
+            }
+        }
+
         return response;
 
     } catch (error) {
-        // ERROR: Remove the local file so /tmp doesn't fill up
-        // Wrap in try/catch in case file doesn't exist
-        try {
-            fs.unlinkSync(localFilePath);
-        } catch (e) { 
-            console.log("Error deleting file:", e); 
-        }
+        console.error("Cloudinary upload error:", error);
         return null;
     }
 }
+
 module.exports = { uploadOnCloudinary };

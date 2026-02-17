@@ -34,7 +34,7 @@ const createCurrentAffair = async (req, res) => {
     // 1. Handle Image Upload
     let imageUrl = '';
     if (req.file) {
-      const uploadResult = await uploadOnCloudinary(req.file.path);
+      const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
       if (uploadResult) {
         imageUrl = uploadResult.url;
       }
@@ -110,7 +110,7 @@ const updateCurrentAffair = async (req, res) => {
 
     // Update Image ONLY if a new file is uploaded
     if (req.file) {
-      const uploadResult = await uploadOnCloudinary(req.file.path);
+      const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
       if (uploadResult) {
         article.imageUrl = uploadResult.url;
       }
