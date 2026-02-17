@@ -14,14 +14,14 @@ import NotificationPage from './pages/Notification.jsx'; // Detail View for Upda
 import SelectionPage from './pages/Selections.jsx'; // Hall of Fame (Results)
 import CurrentAffairsPage from './pages/CurrentAffairsPage.jsx'; // New Page for Current Affairs
 import CourseDetailPage from './pages/CourseDetailpage.jsx'; // Detail View for Courses
-import BookDemo from './pages/BookDemoPage.jsx';
+import BookDemoPage from './pages/BookDemoPage.jsx';
 // --- Admin Pages ---
 import Login from './admin/Login';
 import ManageCourses from './admin/ManageCourses';
 import ManageUpdates from './admin/ManageUpdates';
 import ManageResults from './admin/ManageResults'; // For Hall of Fame
 import ManageCurrentAffairs from './admin/ManageCurrentAffairs'; // New Admin Page for Current Affairs
-
+import ManageDemoRequests from './admin/ManageDemoRequests.jsx';
 // --- Layout Wrapper for Public Pages ---
 const PublicLayout = () => (
   <div className="font-sans text-gray-700 bg-white flex flex-col min-h-screen">
