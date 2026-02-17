@@ -59,7 +59,7 @@ function App() {
           <Route path="/current-affairs/:slug" element={<CurrentAffairsPage />} />
           
           {/* Results / Hall of Fame */}
-          <Route path="/book-demo" element={<BookDemo />} />
+          <Route path="/book-demo" element={<BookDemoPage />} />
           <Route path="/Selections" element={<SelectionPage  />} />
         
         </Route>
