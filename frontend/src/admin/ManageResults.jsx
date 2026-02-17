@@ -63,7 +63,9 @@ const ManageResults = () => {
     }
 
     try {
-      await api.post('/results', data);
+      await api.post('/results', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       alert('Student added to Hall of Fame!');
       
       // Reset Form
