@@ -122,6 +122,49 @@ const deleteUpdate = async (req, res) => {
   }
 };
 
+const updateUpdate = async (req, res) => {
+  try {
+    const id = req.params.id;
+    let update = await Update.findById(id);
+    if (!update) return res.status(404).json({ message: 'Update not found' });
+
+    const body = { ...req.body };
+
+    // Normalize type enum values (accept lowercase from frontend)
+    if (body.type && typeof body.type === 'string') {
+      const map = { job: 'Job', admit: 'AdmitCard', result: 'Result', notice: 'Notice' };
+      const low = body.type.toLowerCase();
+      if (map[low]) body.type = map[low];
+    }
+
+    // If file uploaded, upload to Cloudinary and set imageUrl
+    if (req.file) {
+      try {
+        const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
+        if (uploadResult) {
+          body.imageUrl = uploadResult.url;
+          console.log("✅ Notification image uploaded to Cloudinary (update):", body.imageUrl);
+        }
+      } catch (uploadError) {
+        console.error("❌ Cloudinary upload error during update:", uploadError);
+        return res.status(400).json({ message: `Image upload failed: ${uploadError.message}` });
+      }
+    }
+
+    // Apply updates and save
+    Object.keys(body).forEach(key => {
+      // Avoid overwriting with undefined
+      if (typeof body[key] !== 'undefined') update[key] = body[key];
+    });
+
+    await update.save();
+    res.json(update);
+  } catch (error) {
+    console.error('Error updating notification:', error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
 // --- CURRENT AFFAIRS ---
 const getCurrentAffairs = async (req, res) => {
   try {
@@ -156,6 +199,7 @@ module.exports = {
   getUpdates, 
   getUpdateById,
   createUpdate, 
+  updateUpdate,
   deleteUpdate, 
   getCurrentAffairs, 
   createCurrentAffair 
