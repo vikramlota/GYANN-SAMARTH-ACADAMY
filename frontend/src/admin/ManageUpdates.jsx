@@ -104,10 +104,13 @@ const ManageUpdates = () => {
              
              <input name="linkUrl" value={formData.linkUrl} onChange={(e)=>setFormData({...formData, linkUrl:e.target.value})} placeholder="Official Link (Optional)" className="w-full border p-2 rounded"/>
              
-             <div className="border border-dashed p-2 rounded">
-               <input type="file" accept="image/*,application/pdf" onChange={(e)=>setImageFile(e.target.files[0])} className="w-full text-sm"/>
-               {imageFile && <p className="text-xs text-gray-500 mt-2">Selected: {imageFile.name}</p>}
-             </div>
+             <div>
+                <label className="text-xs font-bold text-gray-500 uppercase">Image {editingId && '(Leave empty to keep existing)'}</label>
+                  <div className="border border-dashed p-2 rounded flex items-center gap-2 hover:bg-gray-50 cursor-pointer">
+                    <FaUpload className="text-gray-400"/>
+                    <input type="file" onChange={(e) => setImageFile(e.target.files[0])} className="w-full text-sm"/>
+                  </div>  
+              </div>
 
              <button disabled={isSubmitting} className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 disabled:bg-gray-400">
                {isSubmitting ? 'Posting...' : 'Post Update'}
