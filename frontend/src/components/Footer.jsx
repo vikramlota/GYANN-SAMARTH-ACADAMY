@@ -39,9 +39,9 @@ const Footer = () => {
                 <b>Samarth Academy</b> has a strong and positive mission to provide best-in-class education for Banking, SSC, and other Competitive examination.
             </p>
             <div className="flex space-x-3">
-                <a href="#" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaFacebookF /></a>
-                <a href="#" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaInstagram /></a>
-                <a href="https://wa.me/919988949969" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md" target="_blank" rel="noreferrer"><FaWhatsapp /></a>
+                <a href="" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaFacebookF /></a>
+                <a href="https://www.instagram.com/gyanm.samarth.academy?igsh=MTB0NnI5dTliNDlicA%3D%3D" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md"><FaInstagram /></a>
+                <a href="https://wa.me/919041973105" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md" target="_blank" rel="noreferrer"><FaWhatsapp /></a>
             </div>
           </div>
 

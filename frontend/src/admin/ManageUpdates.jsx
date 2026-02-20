@@ -63,7 +63,7 @@ const ManageUpdates = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* FORM */}
-        <div className="md:col-span-1 bg-white p-6 rounded-xl shadow border h-fit">
+        <div className="md:col-span-3 bg-white p-6 rounded-xl shadow border h-fit">
           <form onSubmit={handleSubmit} className="space-y-4">
              <input name="title" value={formData.title} onChange={(e)=>setFormData({...formData, title:e.target.value})} placeholder="Title (e.g. SBI PO Out)" required className="w-full border p-2 rounded"/>
              
@@ -97,7 +97,7 @@ const ManageUpdates = () => {
         </div>
 
         {/* LIST */}
-        <div className="md:col-span-2 space-y-4">
+        <div className="md:col-span-2 space-y-3">
            {updates.map(item => (
              <div key={item._id} className="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
                 <div>
