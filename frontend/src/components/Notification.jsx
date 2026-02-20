@@ -43,6 +43,18 @@ const Notification = () => {
     if (slug) fetchUpdate();
   }, [slug]);
 
+  // Helper to strip HTML tags and decode entities to plain text
+  const stripHtml = (html) => {
+    if (!html) return '';
+    try {
+      const el = document.createElement('div');
+      el.innerHTML = html;
+      return el.textContent || el.innerText || '';
+    } catch (e) {
+      return String(html);
+    }
+  };
+
   const shareNotification = () => {
     if (navigator.share) {
       navigator.share({
@@ -138,12 +150,10 @@ const Notification = () => {
                         {update.title}
                     </h2>
 
-                    {/* Description Text */}
-                    <div 
-                        dangerouslySetInnerHTML={{ __html: update.description }}
-                        className="jodit-html-content text-gray-800 leading-relaxed space-y-4"
-                        style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}
-                    />
+                    {/* Description Text (rendered as plain text) */}
+                    <p className="jodit-html-content text-gray-800 leading-relaxed space-y-4" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                      {stripHtml(update.description)}
+                    </p>
 
                     {/* Image Attachment (If exists) */}
                     {update.imageUrl && (

@@ -19,6 +19,18 @@ const CurrentAffairs = () => {
       .replace(/-+/g, '-');
   };
 
+  // Helper to strip HTML tags and decode entities to plain text
+  const stripHtml = (html) => {
+    if (!html) return '';
+    try {
+      const el = document.createElement('div');
+      el.innerHTML = html;
+      return el.textContent || el.innerText || '';
+    } catch (e) {
+      return String(html);
+    }
+  };
+
   // Categories for filtering
   const categories = ['All', 'National', 'International', 'Sports', 'Science', 'Economy'];
 
@@ -125,9 +137,9 @@ const CurrentAffairs = () => {
                                 {item.headline}
                             </h3>
                             
-                            {/* <p className="text-gray-600 text-sm line-clamp-4 mb-4 flex-grow">
-                                {item.contentBody || item.description}
-                            </p> */}
+                            <p className="text-gray-600 text-sm line-clamp-4 mb-4 flex-grow">
+                              {stripHtml(item.contentBody || item.description)}
+                            </p>
 
                             <Link to={`/current-affairs/${item.slug}`} className="w-full mt-auto border border-blue-100 bg-blue-50 text-blue-600 font-bold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors text-sm block text-center">
                                 Read Full Story
