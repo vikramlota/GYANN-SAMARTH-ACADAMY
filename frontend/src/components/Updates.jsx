@@ -159,9 +159,11 @@ const Updates = () => {
                          <span className={`${item.badgeColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide`}>{item.badgeText}</span>
                          <span className="text-gray-400 text-xs flex items-center"><FaClock className="mr-1"/> {item.date}</span>
                       </div>
-                   {item.imageUrl && (
-                    <img src={item.imageUrl} alt={item.imageAlt} className="w-24 h-16 object-cover rounded-md mb-3" loading="lazy" />
-                   )}
+                      {item.imageUrl ? (
+                        <img src={item.imageUrl} alt={item.imageAlt} className="w-24 h-16 object-cover rounded-md mb-3" loading="lazy" />
+                      ) : (
+                        <img src="https://placehold.co/240x160?text=No+Image" alt="No image" className="w-24 h-16 object-cover rounded-md mb-3 opacity-60" loading="lazy" />
+                      )}
                    <h3 className="text-xl font-bold text-gray-900 mb-1">{item.title}</h3>
                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.desc}</p>
                    </div>

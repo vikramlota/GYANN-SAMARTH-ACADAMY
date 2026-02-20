@@ -100,7 +100,8 @@ const ManageUpdates = () => {
              <input name="linkUrl" value={formData.linkUrl} onChange={(e)=>setFormData({...formData, linkUrl:e.target.value})} placeholder="Official Link (Optional)" className="w-full border p-2 rounded"/>
              
              <div className="border border-dashed p-2 rounded">
-                <input type="file" onChange={(e)=>setImageFile(e.target.files[0])} className="w-full text-sm"/>
+               <input type="file" accept="image/*,application/pdf" onChange={(e)=>setImageFile(e.target.files[0])} className="w-full text-sm"/>
+               {imageFile && <p className="text-xs text-gray-500 mt-2">Selected: {imageFile.name}</p>}
              </div>
 
              <button disabled={isSubmitting} className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 disabled:bg-gray-400">
