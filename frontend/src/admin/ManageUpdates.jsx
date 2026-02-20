@@ -50,9 +50,14 @@ const ManageUpdates = () => {
     const data = new FormData();
     Object.keys(formData).forEach(key => data.append(key, formData[key]));
     if (imageFile) data.append('image', imageFile);
-
+    // Debug: log FormData entries to ensure file is attached
     try {
-      await api.post('/notifications', data);
+      for (const pair of data.entries()) {
+        console.log('FormData entry:', pair[0], pair[1]);
+      }
+
+      // Force multipart/form-data for this request to ensure proper boundary header
+      await api.post('/notifications', data, { headers: { 'Content-Type': 'multipart/form-data' } });
       alert('Update Posted!');
       setFormData({ title: '', description: '', type: 'job', linkUrl: '', isLatest: true });
       setImageFile(null);
