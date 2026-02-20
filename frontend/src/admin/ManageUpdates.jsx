@@ -12,6 +12,8 @@ const ManageUpdates = () => {
     title: '', description: '', type: 'job', linkUrl: '' , isLatest: true
   });
   const [imageFile, setImageFile] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [existingImage, setExistingImage] = useState(null);
 
   // Jodit Editor Configuration
   const editorConfig = {
@@ -57,10 +59,16 @@ const ManageUpdates = () => {
       }
 
       // Force multipart/form-data for this request to ensure proper boundary header
-      await api.post('/notifications', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      if (editingId) {
+        await api.put(`/notifications/${editingId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      } else {
+        await api.post('/notifications', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      }
       alert('Update Posted!');
       setFormData({ title: '', description: '', type: 'job', linkUrl: '', isLatest: true });
       setImageFile(null);
+      setEditingId(null);
+      setExistingImage(null);
       fetchUpdates();
     } catch (error) { 
       console.error("Error posting update:", error.response?.data || error.message || error);
@@ -108,9 +116,15 @@ const ManageUpdates = () => {
                 <label className="text-xs font-bold text-gray-500 uppercase">Image {editingId && '(Leave empty to keep existing)'}</label>
                   <div className="border border-dashed p-2 rounded flex items-center gap-2 hover:bg-gray-50 cursor-pointer">
                     <FaUpload className="text-gray-400"/>
-                    <input type="file" onChange={(e) => setImageFile(e.target.files[0])} className="w-full text-sm"/>
-                  </div>  
-              </div>
+                    <input type="file" accept="image/*,application/pdf" onChange={(e) => setImageFile(e.target.files[0])} className="w-full text-sm"/>
+                  </div>
+                  {existingImage && !imageFile && (
+                    <p className="text-xs text-gray-500 mt-2">Current attachment: <a href={existingImage} target="_blank" rel="noreferrer" className="underline">View</a></p>
+                  )}
+                  {imageFile && (
+                    <p className="text-xs text-gray-500 mt-2">Selected: {imageFile.name}</p>
+                  )}
+             </div>
 
              <button disabled={isSubmitting} className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 disabled:bg-gray-400">
                {isSubmitting ? 'Posting...' : 'Post Update'}
@@ -119,20 +133,29 @@ const ManageUpdates = () => {
         </div>
 
         {/* LIST */}
-        <div className="md:col-span-2 space-y-3">
-           {updates.map(item => (
+          <div className="md:col-span-2 space-y-3">
+            {updates.map(item => (
              <div key={item._id} className="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
-                <div>
-                   <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${item.type==='job'?'bg-green-100 text-green-700': item.type==='result'?'bg-orange-100 text-orange-700':'bg-blue-100 text-blue-700'}`}>
-                      {item.type}
-                   </span>
-                   <h4 className="font-bold mt-1">{item.title}</h4>
-                   <p className="text-xs text-gray-500">{new Date(item.datePosted || Date.now()).toLocaleDateString()}</p>
-                </div>
+               <div>
+                 <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${item.type==='job'?'bg-green-100 text-green-700': item.type==='result'?'bg-orange-100 text-orange-700':'bg-blue-100 text-blue-700'}`}>
+                   {item.type}
+                 </span>
+                 <h4 className="font-bold mt-1">{item.title}</h4>
+                 <p className="text-xs text-gray-500">{new Date(item.datePosted || Date.now()).toLocaleDateString()}</p>
+               </div>
+               <div className="flex items-center gap-2">
+                <button onClick={() => {
+                   // populate form for editing
+                   setFormData({ title: item.title || '', description: item.description || '', type: (item.type || 'job').toLowerCase(), linkUrl: item.linkUrl || '', isLatest: item.isLatest ?? true });
+                   setEditingId(item._id);
+                   setExistingImage(item.imageUrl || null);
+                   window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }} className="text-blue-600 p-2 hover:bg-blue-50 rounded">Edit</button>
                 <button onClick={() => handleDelete(item._id)} className="text-red-500 p-2 hover:bg-red-50 rounded"><FaTrash/></button>
+               </div>
              </div>
-           ))}
-        </div>
+            ))}
+          </div>
       </div>
     </div>
   );
