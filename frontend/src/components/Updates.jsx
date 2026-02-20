@@ -62,6 +62,18 @@ const Updates = () => {
       .replace(/-+/g, '-');
   };
 
+  // Helper to strip HTML tags and decode entities to plain text
+  const stripHtml = (html) => {
+    if (!html) return '';
+    try {
+      const el = document.createElement('div');
+      el.innerHTML = html;
+      return el.textContent || el.innerText || '';
+    } catch (e) {
+      return String(html);
+    }
+  };
+
   // 1. Process data securely
   const updatesData = updates.map(update => ({
     id: update._id,
@@ -71,7 +83,7 @@ const Updates = () => {
       ? new Date(update.datePosted).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) 
       : 'Just Now',
     title: update.title || 'Untitled Update',
-    desc: update.description || 'No description provided.',
+    desc: stripHtml(update.description || update.contentBody || 'No description provided.'),
     color: getColor(update.type),
     badgeColor: getBadge(update.type).color,
     badgeText: getBadge(update.type).text,
