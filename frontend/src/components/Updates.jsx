@@ -84,6 +84,8 @@ const Updates = () => {
       : 'Just Now',
     title: update.title || 'Untitled Update',
     desc: stripHtml(update.description || update.contentBody || 'No description provided.'),
+    imageUrl: update.imageUrl || update.image || null,
+    imageAlt: update.imageAlt || update.title || '',
     color: getColor(update.type),
     badgeColor: getBadge(update.type).color,
     badgeText: getBadge(update.type).text,
@@ -157,8 +159,11 @@ const Updates = () => {
                          <span className={`${item.badgeColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide`}>{item.badgeText}</span>
                          <span className="text-gray-400 text-xs flex items-center"><FaClock className="mr-1"/> {item.date}</span>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">{item.title}</h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.desc}</p>
+                   {item.imageUrl && (
+                    <img src={item.imageUrl} alt={item.imageAlt} className="w-24 h-16 object-cover rounded-md mb-3" loading="lazy" />
+                   )}
+                   <h3 className="text-xl font-bold text-gray-900 mb-1">{item.title}</h3>
+                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.desc}</p>
                    </div>
                    <div className="shrink-0">
                       {/* FIX: Link to the correct slug path */}
