@@ -16,9 +16,14 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('adminToken');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    if (token) config.headers['Authorization'] = `Bearer ${token}`;
+
+    // If sending FormData (file upload), remove forced JSON header so
+    // the browser/axios can set multipart/form-data with boundary.
+    if (config.data && typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
     }
+
     return config;
   },
   (error) => {

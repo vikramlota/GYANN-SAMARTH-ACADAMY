@@ -167,15 +167,8 @@ const Notification = () => {
                     </h2>
 
                     {/* Image Attachment (If exists) - centered, with caption and lazy loading */}
-                    {(update.imageUrl || update.linkUrl) ? (
+                    {(update.imageUrl || update.linkUrl) && (
                       <div className="mt-6">
-                                              ) : (
-                                              // Placeholder when no image or PDF provided
-                                              <figure className="mt-6 rounded-xl overflow-hidden shadow-sm border border-dashed border-gray-200 text-center p-6">
-                                                <img src="https://placehold.co/800x400?text=No+Attachment" alt="No attachment" className="mx-auto w-full max-w-2xl h-auto object-contain" />
-                                                <figcaption className="text-sm text-gray-400 mt-3">No attachment provided</figcaption>
-                                              </figure>
-                                            )}
                         {/* Prefer explicit imageUrl, fallback to linkUrl */}
                         {isPdf(update.imageUrl || update.linkUrl) ? (
                           <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
