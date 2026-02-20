@@ -16,10 +16,23 @@ const ManageUpdates = () => {
   // Jodit Editor Configuration
   const editorConfig = {
     readonly: false,
-    height: 300,
-    placeholder: 'Write notification details here...',
-    buttons: ['bold', 'italic', 'underline', '|', 'ul', 'ol', '|', 'font', 'fontsize', '|', 'align', '|', 'link', 'image', '|', 'fullsize']
+    height: 400,
+    placeholder: 'Write your current affairs update here...',
+
+   
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: 'insert_as_html',
+   
+    buttons: [
+      'bold', 'italic', 'underline', 'strikethrough', '|',
+      'ul', 'ol', '|',
+      'font', 'fontsize', 'brush', 'paragraph', '|',
+      'table', 'link', 'image', '|', // Includes the table tool
+      'align', 'undo', 'redo', 'source'
+    ]
   };
+
 
   const fetchUpdates = async () => {
     try {

@@ -28,6 +28,12 @@ const ManageCurrentAffairs = () => {
     readonly: false,
     height: 400,
     placeholder: 'Write your current affairs update here...',
+
+   
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: 'insert_as_html',
+   
     buttons: [
       'bold', 'italic', 'underline', 'strikethrough', '|',
       'ul', 'ol', '|',
