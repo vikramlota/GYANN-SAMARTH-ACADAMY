@@ -55,6 +55,22 @@ const Notification = () => {
     }
   };
 
+  // Ensure URL is absolute (handles relative paths returned by some APIs)
+  const normalizeUrl = (url) => {
+    if (!url) return '';
+    try {
+      const parsed = new URL(url, window.location.href);
+      return parsed.href;
+    } catch (e) {
+      return url;
+    }
+  };
+
+  const isPdf = (url) => {
+    if (!url) return false;
+    return url.split('?')[0].toLowerCase().endsWith('.pdf');
+  };
+
   const shareNotification = () => {
     if (navigator.share) {
       navigator.share({
@@ -151,13 +167,27 @@ const Notification = () => {
                     </h2>
 
                     {/* Image Attachment (If exists) - centered, with caption and lazy loading */}
-                    {update.imageUrl && (
-                      <figure className="mt-6 rounded-xl overflow-hidden shadow-md border border-gray-100">
-                        <img src={update.imageUrl} alt={update.imageAlt || update.title} loading="lazy" className="w-full h-auto object-cover" />
-                        {(update.imageCaption || update.imageAlt) && (
-                          <figcaption className="text-sm text-gray-500 p-3">{update.imageCaption || update.imageAlt}</figcaption>
+                    {(update.imageUrl || update.linkUrl) && (
+                      <div className="mt-6">
+                        {/* Prefer explicit imageUrl, fallback to linkUrl */}
+                        {isPdf(update.imageUrl || update.linkUrl) ? (
+                          <div className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                            <object data={normalizeUrl(update.imageUrl || update.linkUrl)} type="application/pdf" width="100%" height="600">
+                              <p className="p-6 text-center text-gray-600">PDF preview not available. <a href={normalizeUrl(update.imageUrl || update.linkUrl)} target="_blank" rel="noreferrer" className="text-brand-red underline">Open PDF</a></p>
+                            </object>
+                            {(update.imageCaption || update.imageAlt) && (
+                              <div className="text-sm text-gray-500 p-3">{update.imageCaption || update.imageAlt}</div>
+                            )}
+                          </div>
+                        ) : (
+                          <figure className="rounded-xl overflow-hidden shadow-md border border-gray-100">
+                            <img src={normalizeUrl(update.imageUrl || update.linkUrl)} alt={update.imageAlt || update.title} loading="lazy" className="w-full h-auto object-cover" />
+                            {(update.imageCaption || update.imageAlt) && (
+                              <figcaption className="text-sm text-gray-500 p-3">{update.imageCaption || update.imageAlt}</figcaption>
+                            )}
+                          </figure>
                         )}
-                      </figure>
+                      </div>
                     )}
 
                     {/* Description Text (rendered as plain text) */}
