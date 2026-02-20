@@ -147,20 +147,23 @@ const Notification = () => {
 
                     {/* NEW: Title inside Body (Bold as requested) */}
                     <h2 className="text-2xl font-bold text-gray-900">
-                        {update.title}
+                      {update.title}
                     </h2>
+
+                    {/* Image Attachment (If exists) - centered, with caption and lazy loading */}
+                    {update.imageUrl && (
+                      <figure className="mt-6 rounded-xl overflow-hidden shadow-md border border-gray-100">
+                        <img src={update.imageUrl} alt={update.imageAlt || update.title} loading="lazy" className="w-full h-auto object-cover" />
+                        {(update.imageCaption || update.imageAlt) && (
+                          <figcaption className="text-sm text-gray-500 p-3">{update.imageCaption || update.imageAlt}</figcaption>
+                        )}
+                      </figure>
+                    )}
 
                     {/* Description Text (rendered as plain text) */}
                     <p className="jodit-html-content text-gray-800 leading-relaxed space-y-4" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
                       {stripHtml(update.description)}
                     </p>
-
-                    {/* Image Attachment (If exists) */}
-                    {update.imageUrl && (
-                        <div className="mt-6 rounded-xl overflow-hidden shadow-md border border-gray-100">
-                            <img src={update.imageUrl} alt={update.title} className="w-full h-auto object-cover" />
-                        </div>
-                    )}
                 </div>
 
                 {/* Footer Actions */}
