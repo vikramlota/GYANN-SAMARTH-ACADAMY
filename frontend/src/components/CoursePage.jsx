@@ -55,7 +55,7 @@ const CoursesPage = () => {
                    </div>
                    <p className="text-gray-600 text-sm mb-6 line-clamp-2">{course.description}</p>
                    <Link to={`/courses/${course.slug}`} className="w-full bg-brand-red text-white font-bold py-3 rounded-xl hover:bg-red-700 transition block text-center">
-                      Enroll Now
+                      View Details <FaBookOpen className="inline-block ml-2"/>
                    </Link>
                 </div>
              </div>
