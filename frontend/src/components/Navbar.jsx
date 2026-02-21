@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom'; // 1. Import Link
-import { FaPhoneAlt, FaEnvelope, FaClock, FaFacebookF, FaInstagram, FaYoutube, FaBars, FaTimes } from 'react-icons/fa';
+import { FaPhoneAlt, FaEnvelope, FaClock, FaFacebookF, FaInstagram, FaYoutube, FaBars, FaTimes, FaGooglePlay, FaAppStoreIos } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,9 +34,11 @@ const Navbar = () => {
             <span className="flex items-center"><FaClock className="mr-2 text-brand-orange" /> 9:00 to 6:00 (Mon-Sat)</span>
           </div>
           <div className="flex space-x-4">
-            <a href="#" className="hover:text-brand-orange transition"><FaFacebookF /></a>
-            <a href="#" className="hover:text-brand-orange transition"><FaInstagram /></a>
-            <a href="#" className="hover:text-brand-orange transition"><FaYoutube /></a>
+            <a href="https://www.facebook.com/samarthacademy2006" className="hover:text-brand-orange transition"><FaFacebookF /></a>
+            <a href="https://www.instagram.com/gyanm.samarth.academy?igsh=MTB0NnI5dTliNDlicA%3D%3D" className="hover:text-brand-orange transition"><FaInstagram /></a>
+            <a href="https://youtube.com/@samarth.academyy?si=N6X6HSt5YGEi8goV" className="hover:text-brand-orange transition"><FaYoutube /></a>
+            <a href="https://play.google.com/store/apps/details?id=co.diy4.ptqkn&pcampaignid=web_share" className="hover:text-brand-orange transition"><FaGooglePlay /></a>
+            <a href="https://apps.apple.com/in/app/classplus/id1324522260" className="hover:text-brand-orange transition"><FaAppStoreIos /></a>
           </div>
         </div>
       </div>

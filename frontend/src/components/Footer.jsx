@@ -48,7 +48,7 @@ const Footer = () => {
                 <a href="https://wa.me/919041973105" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md" target="_blank" rel="noreferrer"><FaWhatsapp /></a>
                 <a href="https://play.google.com/store/apps/details?id=co.diy4.ptqkn&pcampaignid=web_share" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md" target="_blank" rel="noreferrer"><FaGooglePlay /></a>
                 <a href="https://apps.apple.com/in/app/classplus/id1324522260" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md" target="_blank" rel="noreferrer"><FaAppStoreIos /></a>
-                <br/>
+              
                 
                 
             </div>
