@@ -25,6 +25,10 @@ const Footer = () => {
     fetchCourses();
   }, []);
 
+  const copyText = () => {
+  navigator.clipboard.writeText("Kaylhy");
+  
+};
   return (
     <footer className="bg-brand-red text-white">
       <div ref={ref} className="container mx-auto px-4 py-12">
@@ -45,9 +49,22 @@ const Footer = () => {
                 <a href="https://play.google.com/store/apps/details?id=co.diy4.ptqkn&pcampaignid=web_share" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md" target="_blank" rel="noreferrer"><FaGooglePlay /></a>
                 <a href="https://apps.apple.com/in/app/classplus/id1324522260" className="w-8 h-8 flex items-center justify-center bg-white text-brand-red rounded-full hover:bg-brand-orange hover:text-white transition transform hover:scale-110 shadow-md" target="_blank" rel="noreferrer"><FaAppStoreIos /></a>
                 <br/>
-                <h6 className="text-xs text-white mt-2 font-bold">ClassPlus Code for IOS: </h6>
+                
                 
             </div>
+            <p className="  text-white mt-4 font-bold">
+              ClassPlus Code for IOS:
+              </p>
+                <button
+  onClick={copyText}
+  className="cursor-pointer transition 
+             hover:bg-red-700 
+             active:bg-brand-orange 
+             focus:outline-none focus:ring-0
+             text-white font-extrabold underline py-2 px-3 rounded"
+>
+  Kaylhy
+</button>
           </div>
 
           {/* Col 2: Dynamic Courses */}
