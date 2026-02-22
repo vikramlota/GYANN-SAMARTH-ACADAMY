@@ -177,7 +177,7 @@ const ManageCourses = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* --- LEFT: FORM (Create or Edit) --- */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-fit sticky top-4">
+        <div className="lg:col-span-2 ">
           <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg text-gray-800">
                   {editingId ? 'Edit Course' : 'Add New Course'}
