@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
 import JoditEditor from 'jodit-react';
-import { FaTrash, FaBell, FaUpload } from 'react-icons/fa';
+import { FaTrash, FaBell, FaUpload, FaEdit, FaTimes } from 'react-icons/fa';
 
 const ManageUpdates = () => {
   const [updates, setUpdates] = useState([]);
@@ -84,20 +84,43 @@ const ManageUpdates = () => {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><FaBell className="text-yellow-500"/> Manage Notifications</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* FORM */}
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* FORM - 50% width */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-fit sticky top-4">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-bold text-lg">{editingId ? 'Edit Update' : 'Post New Update'}</h3>
+            {editingId && (
+              <button 
+                type="button"
+                onClick={() => {
+                  setEditingId(null);
+                  setFormData({ title: '', description: '', type: 'job', linkUrl: '', isLatest: true });
+                  setImageFile(null);
+                  setExistingImage(null);
+                }} 
+                className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
+              >
+                <FaTimes /> Cancel
+              </button>
+            )}
+          </div>
           <form onSubmit={handleSubmit} className="space-y-4">
-             <input name="title" value={formData.title} onChange={(e)=>setFormData({...formData, title:e.target.value})} placeholder="Title (e.g. SBI PO Out)" required className="w-full border p-2 rounded"/>
+             <div>
+               <label className="text-xs font-bold text-gray-500 uppercase">Title</label>
+               <input name="title" value={formData.title} onChange={(e)=>setFormData({...formData, title:e.target.value})} placeholder="Title (e.g. SBI PO Out)" required className="w-full border p-2 rounded focus:ring-2 focus:ring-yellow-500 outline-none"/>
+             </div>
              
-             <select name="type" value={formData.type} onChange={(e)=>setFormData({...formData, type:e.target.value})} className="w-full border p-2 rounded">
-                <option value="job">New Job</option>
-                <option value="admit">Admit Card</option>
-                <option value="result">Result Declared</option>
-             </select>
+             <div>
+               <label className="text-xs font-bold text-gray-500 uppercase">Type</label>
+               <select name="type" value={formData.type} onChange={(e)=>setFormData({...formData, type:e.target.value})} className="w-full border p-2 rounded bg-white">
+                  <option value="job">New Job</option>
+                  <option value="admit">Admit Card</option>
+                  <option value="result">Result Declared</option>
+               </select>
+             </div>
 
              <div>
                <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Description</label>
@@ -110,7 +133,10 @@ const ManageUpdates = () => {
                />
              </div>
              
-             <input name="linkUrl" value={formData.linkUrl} onChange={(e)=>setFormData({...formData, linkUrl:e.target.value})} placeholder="Official Link (Optional)" className="w-full border p-2 rounded"/>
+             <div>
+               <label className="text-xs font-bold text-gray-500 uppercase">Official Link (Optional)</label>
+               <input name="linkUrl" value={formData.linkUrl} onChange={(e)=>setFormData({...formData, linkUrl:e.target.value})} placeholder="https://example.com" className="w-full border p-2 rounded"/>
+             </div>
              
              <div>
                 <label className="text-xs font-bold text-gray-500 uppercase">Image {editingId && '(Leave empty to keep existing)'}</label>
@@ -119,43 +145,49 @@ const ManageUpdates = () => {
                     <input type="file" accept="image/*,application/pdf" onChange={(e) => setImageFile(e.target.files[0])} className="w-full text-sm"/>
                   </div>
                   {existingImage && !imageFile && (
-                    <p className="text-xs text-gray-500 mt-2">Current attachment: <a href={existingImage} target="_blank" rel="noreferrer" className="underline">View</a></p>
+                    <p className="text-xs text-gray-500 mt-2">Current: <a href={existingImage} target="_blank" rel="noreferrer" className="underline">View</a></p>
                   )}
                   {imageFile && (
                     <p className="text-xs text-gray-500 mt-2">Selected: {imageFile.name}</p>
                   )}
              </div>
 
-             <button disabled={isSubmitting} className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 disabled:bg-gray-400">
-               {isSubmitting ? 'Posting...' : 'Post Update'}
+             <button disabled={isSubmitting} className={`w-full text-white py-2 rounded font-bold transition disabled:bg-gray-400 ${editingId ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-600 hover:bg-blue-700'}`}>
+               {isSubmitting ? 'Saving...' : (editingId ? 'Update' : 'Post Update')}
              </button>
           </form>
         </div>
 
-        {/* LIST */}
-          <div className="lg:col-span-2">
+        {/* LIST - 50% width */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+          <h3 className="font-bold text-lg mb-4">Updates ({updates.length})</h3>
+          <div className="space-y-3 max-h-[600px] overflow-y-auto">
             {updates.map(item => (
-             <div key={item._id} className="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
-               <div>
-                 <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${item.type==='job'?'bg-green-100 text-green-700': item.type==='result'?'bg-orange-100 text-orange-700':'bg-blue-100 text-blue-700'}`}>
-                   {item.type}
-                 </span>
-                 <h4 className="font-bold mt-1">{item.title}</h4>
-                 <p className="text-xs text-gray-500">{new Date(item.datePosted || Date.now()).toLocaleDateString()}</p>
-               </div>
-               <div className="flex items-center gap-2">
-                <button onClick={() => {
-                   // populate form for editing
-                   setFormData({ title: item.title || '', description: item.description || '', type: (item.type || 'job').toLowerCase(), linkUrl: item.linkUrl || '', isLatest: item.isLatest ?? true });
-                   setEditingId(item._id);
-                   setExistingImage(item.imageUrl || null);
-                   window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }} className="text-blue-600 p-2 hover:bg-blue-50 rounded">Edit</button>
-                <button onClick={() => handleDelete(item._id)} className="text-red-500 p-2 hover:bg-red-50 rounded"><FaTrash/></button>
+             <div key={item._id} className={`p-4 rounded-lg border transition ${editingId === item._id ? 'border-yellow-400 bg-yellow-50' : 'border-gray-100 bg-gray-50 hover:shadow-md'}`}>
+               <div className="flex justify-between items-start gap-3">
+                 <div className="flex-grow overflow-hidden">
+                   <span className={`text-xs font-bold px-2 py-1 rounded uppercase inline-block ${item.type==='job'?'bg-green-100 text-green-700': item.type==='result'?'bg-orange-100 text-orange-700':'bg-blue-100 text-blue-700'}`}>
+                     {item.type}
+                   </span>
+                   <h4 className="font-bold mt-2 text-gray-900 line-clamp-2">{item.title}</h4>
+                   <p className="text-xs text-gray-500 mt-1">{new Date(item.datePosted || Date.now()).toLocaleDateString()}</p>
+                 </div>
+                 <div className="flex items-center gap-2 flex-shrink-0">
+                  <button type="button" onClick={() => {
+                     setFormData({ title: item.title || '', description: item.description || '', type: (item.type || 'job').toLowerCase(), linkUrl: item.linkUrl || '', isLatest: item.isLatest ?? true });
+                     setEditingId(item._id);
+                     setExistingImage(item.imageUrl || null);
+                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }} className="text-blue-500 hover:text-blue-700 p-2 bg-blue-50 rounded hover:bg-blue-100 transition">
+                    <FaEdit />
+                  </button>
+                  <button type="button" onClick={() => handleDelete(item._id)} className="text-red-500 hover:text-red-700 p-2 bg-red-50 rounded hover:bg-red-100 transition"><FaTrash/></button>
+                 </div>
                </div>
              </div>
             ))}
           </div>
+        </div>
       </div>
     </div>
   );
