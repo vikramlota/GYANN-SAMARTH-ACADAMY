@@ -7,6 +7,65 @@ import {
 } from 'react-icons/fa';
 
 const Notification = () => {
+  // Styles for rendered HTML content
+  const htmlContentStyles = `
+    .jodit-html-content p {
+      margin-bottom: 1rem;
+      line-height: 1.8;
+    }
+    .jodit-html-content h1, .jodit-html-content h2, .jodit-html-content h3,
+    .jodit-html-content h4, .jodit-html-content h5, .jodit-html-content h6 {
+      margin: 1.5rem 0 0.75rem 0;
+      font-weight: bold;
+      color: #1f2937;
+    }
+    .jodit-html-content h1 { font-size: 1.875rem; }
+    .jodit-html-content h2 { font-size: 1.5rem; }
+    .jodit-html-content h3 { font-size: 1.25rem; }
+    .jodit-html-content ul, .jodit-html-content ol {
+      margin-bottom: 1rem;
+      margin-left: 2rem;
+    }
+    .jodit-html-content li {
+      margin-bottom: 0.5rem;
+      line-height: 1.8;
+    }
+    .jodit-html-content strong { font-weight: 600; }
+    .jodit-html-content em { font-style: italic; }
+    .jodit-html-content a {
+      color: #dc2626;
+      text-decoration: underline;
+    }
+    .jodit-html-content a:hover { color: #b91c1c; }
+    .jodit-html-content blockquote {
+      border-left: 4px solid #dc2626;
+      padding-left: 1rem;
+      margin: 1rem 0;
+      font-style: italic;
+      color: #6b7280;
+    }
+    .jodit-html-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    .jodit-html-content th, .jodit-html-content td {
+      border: 1px solid #e5e7eb;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    .jodit-html-content th {
+      background-color: #f3f4f6;
+      font-weight: 600;
+    }
+    .jodit-html-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.75rem;
+      margin: 1rem 0;
+    }
+  `;
+  
   // CHANGED: Get 'slug' from URL instead of 'id'
   const { slug } = useParams(); 
   const [update, setUpdate] = useState(null);
@@ -107,7 +166,9 @@ const Notification = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+    <>
+      <style>{htmlContentStyles}</style>
+      <div className="bg-gray-50 min-h-screen flex flex-col">
       {/* Header Section */}
       <header className="relative bg-brand-red pt-24 pb-20 overflow-hidden text-center">
         <div className="container mx-auto px-4 relative z-10">
@@ -190,10 +251,15 @@ const Notification = () => {
                       </div>
                     )}
 
-                    {/* Description Text (rendered as plain text) */}
-                    <p className="jodit-html-content text-gray-800 leading-relaxed space-y-4" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
-                      {stripHtml(update.description)}
-                    </p>
+                    {/* Description Text (rendered as formatted HTML) */}
+                    <div 
+                      className="jodit-html-content prose prose-sm max-w-none text-gray-800"
+                      style={{
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word'
+                      }}
+                      dangerouslySetInnerHTML={{ __html: update.description }}
+                    />
                 </div>
 
                 {/* Footer Actions */}
@@ -224,6 +290,7 @@ const Notification = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };
 
