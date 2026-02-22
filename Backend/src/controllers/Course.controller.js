@@ -121,9 +121,16 @@ const updateCourse = async (req, res) => {
     let tempFilePath = null;
     try {
         const { slug } = req.params;
+        let course;
         
-        // Find by slug instead of id
-        const course = await Course.findOne({ slug });
+        // Check if param is a MongoDB ObjectId or a slug
+        if (slug.match(/^[0-9a-fA-F]{24}$/)) {
+          // It's a valid MongoDB ObjectId
+          course = await Course.findById(slug);
+        } else {
+          // It's a slug, search by slug field
+          course = await Course.findOne({ slug });
+        }
 
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
@@ -192,9 +199,16 @@ const updateCourse = async (req, res) => {
 const deleteCourse = async (req, res) => {
   try {
     const { slug } = req.params;
+    let course;
     
-    // Find by slug instead of id
-    const course = await Course.findOne({ slug });
+    // Check if param is a MongoDB ObjectId or a slug
+    if (slug.match(/^[0-9a-fA-F]{24}$/)) {
+      // It's a valid MongoDB ObjectId
+      course = await Course.findById(slug);
+    } else {
+      // It's a slug, search by slug field
+      course = await Course.findOne({ slug });
+    }
     
     if (course) {
       await Course.deleteOne({ _id: course._id });
