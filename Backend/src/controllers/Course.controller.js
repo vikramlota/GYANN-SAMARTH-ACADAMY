@@ -115,13 +115,15 @@ const createCourse = async (req, res) => {
   }
 };
 // @desc    Update a course
-// @route   PUT /api/courses/:id
+// @route   PUT /api/courses/:slug
 // @access  Private (Admin)
 const updateCourse = async (req, res) => {
     let tempFilePath = null;
     try {
-        const { id } = req.params;
-        const course = await Course.findById(id);
+        const { slug } = req.params;
+        
+        // Find by slug instead of id
+        const course = await Course.findOne({ slug });
 
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
@@ -171,7 +173,7 @@ const updateCourse = async (req, res) => {
 
         // 3. Update the course
         const updatedCourse = await Course.findByIdAndUpdate(
-            id,
+            course._id,
             { $set: body },
             { new: true, runValidators: true } // Return the new document
         );
@@ -185,14 +187,18 @@ const updateCourse = async (req, res) => {
 };
 
 // @desc    Delete a course
-// @route   DELETE /api/courses/:id
+// @route   DELETE /api/courses/:slug
 // @access  Private (Admin)
 const deleteCourse = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    const { slug } = req.params;
+    
+    // Find by slug instead of id
+    const course = await Course.findOne({ slug });
+    
     if (course) {
-      await course.deleteOne();
-      res.json({ message: 'Course removed' });
+      await Course.deleteOne({ _id: course._id });
+      res.json({ message: 'Course removed successfully', deletedCourse: course });
     } else {
       res.status(404).json({ message: 'Course not found' });
     }
