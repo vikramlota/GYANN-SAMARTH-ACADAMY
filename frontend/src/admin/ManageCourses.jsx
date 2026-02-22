@@ -299,7 +299,7 @@ const ManageCourses = () => {
         </div>
 
         {/* --- RIGHT: COURSE LIST --- */}
-        <div className="lg:col-span-2 grid grid-cols-2 gap-6">
+        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
            {courses.map(course => (
              <div key={course._id} className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden flex flex-col hover:shadow-xl transition-all">
                 {/* Image */}
