@@ -1,56 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import api from '../utils/api'; // Ensure this points to your utils/api.js
+import api from '../utils/api';
 import { Link } from 'react-router-dom';
-import { FaWhatsapp, FaClock, FaArrowRight, FaFilter } from 'react-icons/fa';
+import { FaCalendarAlt, FaSearch, FaTag, FaBell } from 'react-icons/fa';
 
 const Updates = () => {
-  const [filter, setFilter] = useState('all');
   const [updates, setUpdates] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUpdates = async () => {
-      try {
-        const response = await api.get('/notifications');
-        
-        // ROBUST DATA HANDLING
-        // This grabs the array whether it's direct [] or nested inside { data: [] }
-        const rawData = Array.isArray(response.data) 
-          ? response.data 
-          : (response.data.data || []);
-
-        console.log("FINAL UPDATES LIST:", rawData); // Check Console to see if this has items
-        setUpdates(rawData);
-
-      } catch (error) {
-        console.error('Error fetching updates:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUpdates();
-  }, []);
-
-  const getColor = (type) => {
-    // Robust lowercasing to match "Job", "JOB", or "job"
-    const safeType = (type || '').toLowerCase();
-    switch (safeType) {
-      case 'job': return 'bg-green-500';
-      case 'admit': return 'bg-blue-500';
-      case 'result': return 'bg-brand-orange';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getBadge = (type) => {
-    const safeType = (type || '').toLowerCase();
-    switch (safeType) {
-      case 'job': return { color: 'bg-green-100 text-green-700', text: 'Exam' };
-      case 'admit': return { color: 'bg-blue-100 text-blue-700', text: 'Admit Card' };
-      case 'result': return { color: 'bg-orange-100 text-brand-orange', text: 'Result Declared' };
-      default: return { color: 'bg-gray-100 text-gray-700', text: 'Update' };
-    }
-  };
+  const [filter, setFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Helper to generate slug if not present
   const generateSlug = (title) => {
@@ -74,110 +31,125 @@ const Updates = () => {
     }
   };
 
-  // 1. Process data securely
-  const updatesData = updates.map(update => ({
-    id: update._id,
-    slug: update.slug || generateSlug(update.title),
-    type: update.type || 'other',
-    date: update.datePosted 
-      ? new Date(update.datePosted).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) 
-      : 'Just Now',
-    title: update.title || 'Untitled Update',
-    desc: stripHtml(update.description || update.contentBody || 'No description provided.'),
-    imageUrl: update.imageUrl || update.image || null,
-    imageAlt: update.imageAlt || update.title || '',
-    color: getColor(update.type),
-    badgeColor: getBadge(update.type).color,
-    badgeText: getBadge(update.type).text,
-    // Add raw type for filtering comparison
-    rawType: (update.type || '').toLowerCase() 
-  }));
+  // Categories for filtering
+  const categories = ['All', 'Job', 'Admit', 'Result', 'Update'];
 
-  // 2. Filter logic (Case Insensitive)
-  const filteredUpdates = filter === 'all' 
-    ? updatesData 
-    : updatesData.filter(item => item.rawType === filter.toLowerCase());
+  useEffect(() => {
+    const fetchUpdates = async () => {
+      try {
+        const { data } = await api.get('/notifications');
+        
+        // Add slug to each update item if not present
+        const updatesWithSlugs = (Array.isArray(data) ? data : (data.data || [])).map(item => ({
+          ...item,
+          slug: item.slug || generateSlug(item.title)
+        }));
+        
+        setUpdates(updatesWithSlugs);
+      } catch (error) {
+        console.error("Error fetching updates:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUpdates();
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-red mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading updates...</p>
-        </div>
-      </div>
-    );
-  }
+  // Filter logic
+  const filteredUpdates = updates.filter(item => {
+    const matchesCategory = filter === 'All' || (item.type || 'Update')?.toLowerCase() === filter.toLowerCase();
+    const matchesSearch = (item.title || '').toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <header className="relative bg-brand-red pt-16 pb-20 text-center">
-        <div className="container mx-auto px-4 relative z-10">
-            <h1 className="text-4xl md:text-5xl font-black text-white mb-4">Latest Notifications</h1>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-12 flex flex-col lg:flex-row gap-8">
+    <div className="bg-gray-50 min-h-screen py-12 px-4">
+      <div className="container mx-auto max-w-6xl">
         
-        {/* Sidebar Filters */}
-        <aside className="lg:w-1/4">
-           <div className="bg-white rounded-2xl shadow-md p-6 sticky top-24">
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center"><FaFilter className="mr-2"/> Filters</h3>
-              <div className="space-y-2">
-                 {['all', 'job', 'admit', 'result'].map(cat => (
-                   <button 
-                     key={cat}
-                     onClick={() => setFilter(cat)}
-                     className={`w-full text-left px-4 py-2 rounded-lg capitalize font-medium transition-colors ${filter === cat ? 'bg-red-100 text-red-600' : 'text-gray-600 hover:bg-gray-50'}`}
-                   >
-                     {cat === 'all' ? 'All Updates' : cat}
-                   </button>
-                 ))}
-              </div>
-           </div>
-        </aside>
-
-        {/* Main Feed */}
-        <div className="lg:w-3/4 grid gap-6">
-           
-           {/* DEBUG MESSAGE if list is empty */}
-           {filteredUpdates.length === 0 && (
-             <div className="text-center py-10 bg-white rounded-2xl shadow p-6 border-l-4 border-yellow-400">
-                <h3 className="text-xl font-bold text-gray-800">No updates found</h3>
-                <p className="text-gray-600">
-                   We fetched {updates.length} items from the server, but 0 matched the category "{filter}".
-                </p>
-                <button onClick={() => setFilter('all')} className="mt-4 text-brand-red underline">Show All</button>
-             </div>
-           )}
-
-           {filteredUpdates.map((item) => (
-             <div key={item.id} className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-all">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                   <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                         <span className={`${item.badgeColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide`}>{item.badgeText}</span>
-                         <span className="text-gray-400 text-xs flex items-center"><FaClock className="mr-1"/> {item.date}</span>
-                      </div>
-                      {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.imageAlt} className="w-24 h-16 object-cover rounded-md mb-3" loading="lazy" />
-                      ) : (
-                        <img src="https://placehold.co/240x160?text=No+Image" alt="No image" className="w-24 h-16 object-cover rounded-md mb-3 opacity-60" loading="lazy" />
-                      )}
-                   <h3 className="text-xl font-bold text-gray-900 mb-1">{item.title}</h3>
-                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">{item.desc}</p>
-                   </div>
-                   <div className="shrink-0">
-                      {/* FIX: Link to the correct slug path */}
-                      <Link to={`/notifications/${item.slug}`} className="inline-flex items-center justify-center w-full md:w-auto px-6 py-3 bg-red-50 text-brand-red font-bold rounded-xl border border-red-100 hover:bg-brand-red hover:text-white transition-all">
-                         View Details <FaArrowRight className="ml-2"/>
-                      </Link>
-                   </div>
-                </div>
-             </div>
-           ))}
+        {/* Header */}
+        <div className="text-center mb-12">
+          <span className="inline-block py-1 px-3 rounded-full bg-red-100 text-brand-red font-bold text-xs uppercase mb-2">Stay Updated</span>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Latest <span className="text-brand-red">Notifications</span></h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">Stay updated with the latest exam notifications, results, and announcements. Essential for your exam preparation.</p>
         </div>
-      </main>
+
+        {/* Controls: Search & Filter */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-10 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            {/* Category Tabs */}
+            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto no-scrollbar">
+                {categories.map(cat => (
+                    <button 
+                        key={cat}
+                        onClick={() => setFilter(cat)}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors ${filter === cat ? 'bg-brand-red text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                    >
+                        {cat}
+                    </button>
+                ))}
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative w-full md:w-64">
+                <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                <input 
+                    type="text" 
+                    placeholder="Search updates..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red"
+                />
+            </div>
+        </div>
+
+        {/* Updates Grid */}
+        {loading ? (
+             <div className="text-center py-20 text-gray-500">Loading updates...</div>
+        ) : filteredUpdates.length === 0 ? (
+             <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
+                <FaBell className="mx-auto text-4xl text-gray-300 mb-2"/>
+                <p className="text-gray-500">No updates found for this category.</p>
+             </div>
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredUpdates.map((item) => (
+                    <div key={item._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
+                        {/* Image */}
+                        <div className="h-48 overflow-hidden relative">
+                            <img 
+                                src={item.imageUrl || item.linkUrl || "https://placehold.co/600x400?text=Notification+Update"} 
+                                alt={item.title} 
+                                className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                            />
+                            <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1 rounded-full uppercase shadow-md">
+                                {item.type || 'Update'}
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 flex-grow flex flex-col">
+                            <div className="flex items-center text-xs text-gray-500 mb-3">
+                                <FaCalendarAlt className="mr-1 text-brand-red"/>
+                                {new Date(item.datePosted || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </div>
+                            
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight hover:text-brand-red transition-colors">
+                                {item.title}
+                            </h3>
+                            
+                            <p className="text-gray-600 text-sm line-clamp-4 mb-4 flex-grow">
+                              {stripHtml(item.description || item.contentBody)}
+                            </p>
+
+                            <Link to={`/notifications/${item.slug}`} className="w-full mt-auto border border-red-100 bg-red-50 text-brand-red font-bold py-2 rounded-lg hover:bg-brand-red hover:text-white transition-colors text-sm block text-center">
+                                View Details
+                            </Link>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+
+      </div>
     </div>
   );
 };
