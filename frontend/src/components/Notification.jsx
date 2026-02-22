@@ -192,7 +192,7 @@ const Notification = () => {
                         <div className="bg-brand-red p-2 rounded-lg text-white"><FaUniversity className="text-lg md:text-xl"/></div>
                         <div>
                             <h2 className="text-white font-bold text-base md:text-lg leading-tight">Official Notification</h2>
-                            <p className="text-gray-400 text-[10px] md:text-xs">Slug: {update?.slug}</p>
+                            {/* <p className="text-gray-400 text-[10px] md:text-xs">Slug: {update?.slug}</p> */}
                         </div>
                     </div>
                     <button className="text-gray-400 hover:text-white transition-colors" onClick={() => window.print()}>
