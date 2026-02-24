@@ -114,6 +114,35 @@ const Notification = () => {
     }
   };
 
+  // Build a YouTube embed URL from various possible inputs (full URL, youtu.be, or ID)
+  const getYoutubeEmbedSrc = (value) => {
+    if (!value) return null;
+    try {
+      // If value already looks like an embed URL, return it
+      if (value.includes('youtube.com/embed') || value.includes('youtube-nocookie.com/embed')) return value;
+
+      // If it's a youtu.be short link
+      if (value.includes('youtu.be')) {
+        const id = value.split('/').pop().split('?')[0];
+        return `https://www.youtube.com/embed/${id}`;
+      }
+
+      // If it's a full youtube URL with v= param
+      if (value.includes('youtube.com')) {
+        const u = new URL(value);
+        const id = u.searchParams.get('v');
+        if (id) return `https://www.youtube.com/embed/${id}`;
+      }
+
+      // Otherwise assume it's a raw video id
+      const possibleId = value.trim();
+      if (possibleId.length >= 8 && possibleId.length <= 64) return `https://www.youtube.com/embed/${possibleId}`;
+    } catch (e) {
+      // fallback
+    }
+    return null;
+  };
+
   // Ensure URL is absolute (handles relative paths returned by some APIs)
   const normalizeUrl = (url) => {
     if (!url) return '';
@@ -260,6 +289,28 @@ const Notification = () => {
                       }}
                       dangerouslySetInnerHTML={{ __html: update.description }}
                     />
+
+                    {/* Optional YouTube Video (if provided) */}
+                    {(() => {
+                      const vid = update.youtubeUrl || update.videoUrl || update.videoId || update.video;
+                      const embed = getYoutubeEmbedSrc(vid);
+                      if (!embed) return null;
+                      return (
+                        <div className="mt-6">
+                          <h3 className="text-lg font-semibold mb-3">Video</h3>
+                          <div className="relative" style={{ paddingTop: '56.25%' }}>
+                            <iframe
+                              title="Notification Video"
+                              src={`${embed}?rel=0`}
+                              className="absolute inset-0 w-full h-full rounded-lg border-0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              loading="lazy"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
                 </div>
 
                 {/* Footer Actions */}

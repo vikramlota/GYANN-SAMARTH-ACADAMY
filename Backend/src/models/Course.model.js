@@ -36,6 +36,11 @@ const CourseSchema = new mongoose.Schema({
     required: false,
     default: null
   },
+  youtubeLink: {
+    type: String,
+    default: '',
+    required: false
+  },
   category: {
     type: String,
     enum: ['SSC', 'Banking', 'State', 'Defence', 'Teaching', 'Other'],

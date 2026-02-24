@@ -117,10 +117,16 @@ const ManageUpdates = () => {
                <label className="text-xs font-bold text-gray-500 uppercase">Type</label>
                <select name="type" value={formData.type} onChange={(e)=>setFormData({...formData, type:e.target.value})} className="w-full border p-2 rounded bg-white">
                   <option value="job">New Job</option>
-                  <option value="admit">Admit Card</option>
+                  <option value="admit">Admit Card Update</option>
                   <option value="result">Result Declared</option>
+                  <option value="New Notification">New Notification</option>
+                  <option value="exam strategy">Exam Strategy</option>
+                  <option value="exam pattern">Exam Pattern</option>
+                  <option value="cut-off analysis">Cut-Off Analysis</option>
+                  
                </select>
              </div>
+             
 
              <div>
                <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Description</label>

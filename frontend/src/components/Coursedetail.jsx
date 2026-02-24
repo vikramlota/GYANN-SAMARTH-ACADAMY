@@ -54,6 +54,25 @@ const CourseDetail = () => {
     }
   };
 
+  const getYoutubeEmbedSrc = (value) => {
+    if (!value) return null;
+    try {
+      if (value.includes('youtube.com/embed') || value.includes('youtube-nocookie.com/embed')) return value;
+      if (value.includes('youtu.be')) {
+        const id = value.split('/').pop().split('?')[0];
+        return `https://www.youtube.com/embed/${id}`;
+      }
+      if (value.includes('youtube.com')) {
+        const u = new URL(value);
+        const id = u.searchParams.get('v');
+        if (id) return `https://www.youtube.com/embed/${id}`;
+      }
+      const possibleId = value.trim();
+      if (possibleId.length >= 8 && possibleId.length <= 64) return `https://www.youtube.com/embed/${possibleId}`;
+    } catch (e) {}
+    return null;
+  };
+
   // --- Loading State ---
   if (loading) {
     return (
@@ -146,6 +165,27 @@ const CourseDetail = () => {
                     <div className="prose max-w-none text-gray-700 text-lg leading-relaxed whitespace-pre-line">
                         {course.description}
                     </div>
+                    {/* Optional Course Video */}
+                    {(() => {
+                      const vid = course.youtubeUrl || course.videoUrl || course.videoId || course.video;
+                      const embed = getYoutubeEmbedSrc(vid);
+                      if (!embed) return null;
+                      return (
+                        <div className="mt-6">
+                          <h3 className="text-xl font-semibold mb-3">Course Preview</h3>
+                          <div className="relative" style={{ paddingTop: '56.25%' }}>
+                            <iframe
+                              title="Course Video"
+                              src={`${embed}?rel=0`}
+                              className="absolute inset-0 w-full h-full rounded-lg border-0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              loading="lazy"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
                 </div>
 
                 {/* Features Box */}

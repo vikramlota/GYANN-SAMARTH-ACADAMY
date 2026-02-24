@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
-import { FaTrash, FaPlus, FaBook, FaUpload, FaPalette, FaList, FaEdit, FaTimes } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaBook, FaUpload, FaPalette, FaList, FaEdit, FaTimes, FaYoutube } from 'react-icons/fa'; // Added FaYoutube
 
 const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   
-  // NEW: State to track which course we are editing
+  // State to track which course we are editing
   const [editingId, setEditingId] = useState(null);
   
   // Ref to clear file input manually
@@ -22,6 +22,7 @@ const ManageCourses = () => {
     category: 'SSC',
     badgeText: '',
     link: '',
+    youtubeLink: '', // NEW: State for YouTube link
     colorTheme: 'red',
     features: []
   });
@@ -37,7 +38,7 @@ const ManageCourses = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Only auto-generate slug if NOT in edit mode (don't change existing slugs accidentally)
+    // Only auto-generate slug if NOT in edit mode
     if (name === 'title' && !editingId) {
       const generatedSlug = value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
       setFormData({ ...formData, title: value, slug: generatedSlug });
@@ -58,7 +59,7 @@ const ManageCourses = () => {
     setFormData({ ...formData, features: newFeatures });
   };
 
-  // --- NEW: Handle Edit Click ---
+  // --- Handle Edit Click ---
   const handleEdit = (course) => {
     setEditingId(course._id);
     
@@ -74,11 +75,12 @@ const ManageCourses = () => {
         category: course.category,
         badgeText: course.badgeText || '',
         link: course.link || '',
+        youtubeLink: course.youtubeLink || '', // NEW: Populate YouTube link if it exists
         colorTheme: themeString,
         features: course.features || []
     });
     
-    // Clear image file state (user has to upload new one if they want to change it)
+    // Clear image file state 
     setImageFile(null);
     if(fileInputRef.current) fileInputRef.current.value = "";
     
@@ -86,19 +88,19 @@ const ManageCourses = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- NEW: Cancel Edit ---
+  // --- Cancel Edit ---
   const resetForm = () => {
     setEditingId(null);
-    setFormData({ title: '', slug: '', description: '', category: 'SSC', badgeText: '', link: '', colorTheme: 'red', features: [] });
+    setFormData({ title: '', slug: '', description: '', category: 'SSC', badgeText: '', link: '', youtubeLink: '', colorTheme: 'red', features: [] });
     setImageFile(null);
     if(fileInputRef.current) fileInputRef.current.value = "";
   };
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // 1. Create FormData (This part is fine)
+    // 1. Create FormData
     const data = new FormData();
     data.append('title', formData.title);
     data.append('slug', formData.slug);
@@ -106,6 +108,7 @@ const ManageCourses = () => {
     data.append('category', formData.category);
     data.append('badgeText', formData.badgeText);
     data.append('link', formData.link || '');
+    data.append('youtubeLink', formData.youtubeLink || ''); // NEW: Append YouTube link to payload
     
     // Features loop
     formData.features.forEach((feat, index) => {
@@ -124,14 +127,12 @@ const ManageCourses = () => {
     data.append('colorTheme[text]', themeObj.text);
     data.append('colorTheme[border]', themeObj.border);
 
-    // 2. CRITICAL FIX: Ensure file is appended correctly
+    // 2. Append file
     if (imageFile) {
         data.append('image', imageFile);
     }
 
     try {
-      // 3. THE MAGIC FIX: Override the headers
-      // We set 'Content-Type' to undefined so the browser sets the "Boundary" automatically.
       const config = {
           headers: { 
               "Content-Type": "multipart/form-data" 
@@ -155,12 +156,12 @@ const ManageCourses = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleDelete = async (id) => {
     if(window.confirm("Are you sure?")) {
       try {
         await api.delete(`/courses/${id}`);
         setCourses(courses.filter(c => c._id !== id));
-        // If we deleted the course currently being edited, reset form
         if (editingId === id) resetForm();
       } catch {
         alert('Failed to delete');
@@ -221,23 +222,41 @@ const ManageCourses = () => {
                 </div>
             </div>
 
-            {/* Link */}
-            <div>
-                <label className="text-xs font-bold text-gray-500 uppercase">Course Link (Optional)</label>
-                <input 
-                    type="url" 
-                    name="link" 
-                    value={formData.link} 
-                    onChange={handleChange} 
-                    placeholder="https://example.com/course" 
-                    className="w-full border p-2 rounded text-sm" 
-                />
+            {/* Links Group (Website & YouTube) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Course Link */}
+                <div>
+                    <label className="text-xs font-bold text-gray-500 uppercase">Course Link (Optional)</label>
+                    <input 
+                        type="url" 
+                        name="link" 
+                        value={formData.link} 
+                        onChange={handleChange} 
+                        placeholder="https://example.com/course" 
+                        className="w-full border p-2 rounded text-sm outline-none focus:ring-2 focus:ring-blue-500" 
+                    />
+                </div>
+                
+                {/* NEW: YouTube Embed Link */}
+                <div>
+                    <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
+                        <FaYoutube className="text-red-600 text-sm"/> YouTube Link (Optional)
+                    </label>
+                    <input 
+                        type="url" 
+                        name="youtubeLink" 
+                        value={formData.youtubeLink} 
+                        onChange={handleChange} 
+                        placeholder="https://youtube.com/watch?v=..." 
+                        className="w-full border p-2 rounded text-sm outline-none focus:ring-2 focus:ring-red-500" 
+                    />
+                </div>
             </div>
 
             {/* Description */}
             <div>
                 <label className="text-xs font-bold text-gray-500 uppercase">Description</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} rows="3" maxLength="500" required className="w-full border p-2 rounded" />
+                <textarea name="description" value={formData.description} onChange={handleChange} rows="3" maxLength="500" required className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-brand-red" />
             </div>
 
             {/* Color Theme */}
@@ -261,15 +280,15 @@ const ManageCourses = () => {
                         value={currentFeature} 
                         onChange={(e) => setCurrentFeature(e.target.value)} 
                         placeholder="Add feature..." 
-                        className="w-full border p-2 rounded text-sm"
+                        className="w-full border p-2 rounded text-sm outline-none focus:ring-2 focus:ring-gray-300"
                         onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                     />
-                    <button type="button" onClick={addFeature} className="bg-gray-800 text-white px-3 rounded hover:bg-black"><FaPlus/></button>
+                    <button type="button" onClick={addFeature} className="bg-gray-800 text-white px-3 rounded hover:bg-black transition"><FaPlus/></button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                     {formData.features.map((feat, idx) => (
                         <span key={idx} className="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1 border">
-                            {feat} <FaTrash className="cursor-pointer text-red-400" onClick={() => removeFeature(idx)}/>
+                            {feat} <FaTrash className="cursor-pointer text-red-400 hover:text-red-600" onClick={() => removeFeature(idx)}/>
                         </span>
                     ))}
                 </div>
@@ -282,7 +301,6 @@ const ManageCourses = () => {
                 </label>
                 <div className="border border-dashed p-3 rounded flex items-center gap-2 hover:bg-gray-50 cursor-pointer">
                    <FaUpload className="text-gray-400"/>
-                   {/* Added ref to clear input after submit */}
                    <input 
                         ref={fileInputRef}
                         type="file" 
@@ -310,7 +328,7 @@ const ManageCourses = () => {
                         <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold">No Image</div>
                     )}
                     
-                    {/* NEW: Overlay Buttons */}
+                    {/* Overlay Buttons */}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <button onClick={() => handleEdit(course)} className="bg-white text-blue-600 p-2 rounded-full hover:scale-110 transition shadow-lg">
                             <FaEdit />
@@ -336,13 +354,23 @@ const ManageCourses = () => {
                    <h4 className={`text-xl font-bold mb-2 ${course.colorTheme?.text || 'text-gray-800'}`}>{course.title}</h4>
                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">{course.description}</p>
                    
-                   {course.link && (
-                     <p className="text-xs text-blue-600 mb-3 truncate">
-                       🔗 <a href={course.link} target="_blank" rel="noopener noreferrer" className="hover:underline">{course.link}</a>
-                     </p>
-                   )}
+                   {/* Links Preview */}
+                   <div className="space-y-1 mb-3">
+                       {course.link && (
+                         <p className="text-xs text-blue-600 truncate flex items-center gap-1">
+                           🔗 <a href={course.link} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600 truncate">{course.link}</a>
+                         </p>
+                       )}
+                       {/* NEW: YouTube Indicator */}
+                       {course.youtubeLink && (
+                         <p className="text-xs text-red-600 truncate flex items-center gap-1">
+                           <FaYoutube className="text-red-600 text-sm"/> 
+                           <a href={course.youtubeLink} target="_blank" rel="noopener noreferrer" className="hover:underline text-red-600 truncate">Video Attached</a>
+                         </p>
+                       )}
+                   </div>
                    
-                   <ul className="text-xs text-gray-500 space-y-1 mb-4">
+                   <ul className="text-xs text-gray-500 space-y-1 mt-auto">
                        {(course.features || []).slice(0, 3).map((feat, i) => (
                            <li key={i} className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span> {feat}</li>
                        ))}

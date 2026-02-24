@@ -87,19 +87,22 @@ const createCourse = async (req, res) => {
     // Remove empty/null values
     features = features.filter(f => f);
 
-    // 5. MANUAL CONSTRUCTION ( The Fix for "Cast to String" )
-    // We do NOT use { ...req.body }. We pick fields manually.
+    // 5. MANUAL CONSTRUCTION
     const courseData = {
         title: req.body.title,
         slug: req.body.slug,
         description: req.body.description,
         category: req.body.category,
         badgeText: req.body.badgeText,
-        colorTheme: req.body.colorTheme, // Mongoose handles the object structure if schema matches
+        
+        // ---> ADDED THE TWO NEW LINKS HERE <---
+        link: req.body.link,
+        youtubeLink: req.body.youtubeLink,
+        // --------------------------------------
+
+        colorTheme: req.body.colorTheme, 
         features: features,
-        image: imageUrl, // <--- We force the string URL here
-        // Add createdBy if you have auth middleware
-        // createdBy: req.user?._id 
+        image: imageUrl, 
     };
 
     console.log("➡️ Saving Course to DB:", courseData);
@@ -114,6 +117,7 @@ const createCourse = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
 // @desc    Update a course
 // @route   PUT /api/courses/:slug
 // @access  Private (Admin)
@@ -125,10 +129,8 @@ const updateCourse = async (req, res) => {
         
         // Check if param is a MongoDB ObjectId or a slug
         if (slug.match(/^[0-9a-fA-F]{24}$/)) {
-          // It's a valid MongoDB ObjectId
           course = await Course.findById(slug);
         } else {
-          // It's a slug, search by slug field
           course = await Course.findOne({ slug });
         }
 
@@ -136,6 +138,7 @@ const updateCourse = async (req, res) => {
             return res.status(404).json({ message: "Course not found" });
         }
 
+        // The spread operator will automatically pull in req.body.youtubeLink
         const body = { ...req.body };
 
         // 1. Handle New Image Upload (If provided)
@@ -163,7 +166,6 @@ const updateCourse = async (req, res) => {
         }
 
         // 2. Handle Features Array Update
-        // If features are coming as separate fields (features[0], etc.)
         const features = [];
         Object.keys(body).forEach((key) => {
             const m = key.match(/^features\[(\d+)\]$/);
@@ -173,7 +175,6 @@ const updateCourse = async (req, res) => {
             }
         });
         
-        // If we extracted features, update the body
         if (features.length > 0) {
             body.features = features.filter(f => f !== undefined && f !== null);
         }
@@ -182,7 +183,7 @@ const updateCourse = async (req, res) => {
         const updatedCourse = await Course.findByIdAndUpdate(
             course._id,
             { $set: body },
-            { new: true, runValidators: true } // Return the new document
+            { new: true, runValidators: true } 
         );
 
         res.json(updatedCourse);
@@ -201,12 +202,9 @@ const deleteCourse = async (req, res) => {
     const { slug } = req.params;
     let course;
     
-    // Check if param is a MongoDB ObjectId or a slug
     if (slug.match(/^[0-9a-fA-F]{24}$/)) {
-      // It's a valid MongoDB ObjectId
       course = await Course.findById(slug);
     } else {
-      // It's a slug, search by slug field
       course = await Course.findOne({ slug });
     }
     
@@ -229,28 +227,22 @@ const getCourseById = async (req, res) => {
     const param = req.params.id;
     let course;
 
-    // Check if param is a MongoDB ObjectId or a slug
     if (param.match(/^[0-9a-fA-F]{24}$/)) {
-      // It's a valid MongoDB ObjectId
       course = await Course.findById(param);
     } else {
-      // It's a slug, search by slug field
       course = await Course.findOne({ slug: param });
       
-      // If slug not found, try case-insensitive
       if (!course) {
         const regexSlug = new RegExp(`^${param}$`, 'i');
         course = await Course.findOne({ slug: regexSlug });
       }
 
-      // If still not found, try to find by generating slug from title
       if (!course) {
         const allCourses = await Course.find({});
         for (const doc of allCourses) {
           const generatedSlug = generateSlug(doc.title);
           if (generatedSlug === param) {
             course = doc;
-            // Auto-save the generated slug to the document
             if (!doc.slug) {
               doc.slug = generatedSlug;
               await doc.save();
@@ -269,6 +261,7 @@ const getCourseById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 const getCourseBySlug = async (req, res) => {
   try {
     const course = await Course.findOne({ slug: req.params.slug });
@@ -282,5 +275,4 @@ const getCourseBySlug = async (req, res) => {
   }
 };
 
-module.exports = { getCourses, getCourseBySlug, createCourse, updateCourse, deleteCourse };
-
+module.exports = { getCourses, getCourseBySlug, createCourse, updateCourse, deleteCourse, getCourseById };

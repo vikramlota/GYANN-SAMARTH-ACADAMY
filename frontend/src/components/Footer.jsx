@@ -121,6 +121,19 @@ const Footer = () => {
                 <p className="flex items-center"><FaEnvelope className="mr-3 text-lg text-brand-orange flex-shrink-0" /> samarth.academy2006@gmail.com</p>
                 <p className="flex items-start"><FaMapMarkerAlt className="mr-3 mt-1 text-lg text-brand-orange flex-shrink-0" /> SCF 68, UT MARKET, Opp. GNDU, AMRITSAR</p>
             </address>
+            <div className="mt-3">
+              <iframe
+                title="Samarth Academy Location"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1698.5547512529747!2d74.82713965152723!3d31.63085207667954!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3919657f0eba9491%3A0x6035bb024edd918e!2sSamarth%20Academy%20-%20Best%20SSC%20Banking%20Punjab%20Police%20PSSSB%20IBPS%20IAS%20PCS%20PSTET%20UGC%20coaching!5e0!3m2!1sen!2sin!4v1771949840809!5m2!1sen!2sin"
+                className="w-full h-100 rounded-md border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                aria-hidden="false"
+              ></iframe>
+              <p className="text-xs text-red-100 mt-2">
+                <a href="https://maps.app.goo.gl/skvZj9MzW4588etP8" target="_blank" rel="noreferrer" className="underline hover:text-white">View larger map</a>
+              </p>
+            </div>
           </div>
 
         </div>

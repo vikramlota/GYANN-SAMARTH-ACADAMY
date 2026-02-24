@@ -28,7 +28,7 @@ const UpdateSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['Job', 'AdmitCard', 'Result', 'Notice'],
+    enum: ['Job', 'admit', 'Result', 'New Notification', 'Exam Strategy', 'Exam Pattern', 'Cut-Off Analysis'],
     required: true
   },
   linkUrl: {
