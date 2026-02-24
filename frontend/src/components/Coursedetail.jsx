@@ -3,8 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { 
   FaArrowLeft, FaCheckCircle, FaWhatsapp, FaShare, 
-  FaTag, FaGraduationCap, FaChalkboardTeacher, FaClock
-} from 'react-icons/fa';
+  FaTag, FaGraduationCap, FaChalkboardTeacher, FaClock, FaExternalLinkAlt 
+} from 'react-icons/fa'; // Added FaExternalLinkAlt
 
 const CourseDetail = () => {
   const { slug } = useParams();
@@ -15,14 +15,8 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        // Fetch course by slug. 
-        // Note: Ensure your backend has a GET /api/courses/:slug or /api/courses/:id route!
         const response = await api.get(`/courses/${slug}`);
-        
-        // Handle nested data structures gracefully
         const data = response.data.data || response.data;
-        
-        // If your API returns an array (e.g., filtering by slug), grab the first item
         const courseData = Array.isArray(data) ? data[0] : data;
 
         if (courseData) {
@@ -73,7 +67,6 @@ const CourseDetail = () => {
     return null;
   };
 
-  // --- Loading State ---
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -85,7 +78,6 @@ const CourseDetail = () => {
     );
   }
 
-  // --- Error State ---
   if (error || !course) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-600">
@@ -97,7 +89,6 @@ const CourseDetail = () => {
     );
   }
 
-  // Fallback theme colors if not provided
   const themeText = course.colorTheme?.text || 'text-brand-red';
   const themeBg = course.colorTheme?.from || 'from-brand-red';
 
@@ -106,7 +97,6 @@ const CourseDetail = () => {
       
       {/* --- HERO SECTION --- */}
       <header className={`relative bg-gradient-to-r ${themeBg} ${course.colorTheme?.to || 'to-red-900'} pt-24 pb-32 overflow-hidden`}>
-        {/* Background Overlay */}
         <div className="absolute inset-0 bg-black/20"></div>
         
         <div className="container mx-auto px-4 relative z-10 max-w-6xl">
@@ -115,7 +105,6 @@ const CourseDetail = () => {
           </Link>
           
           <div className="flex flex-col md:flex-row gap-8 items-center">
-             {/* Title & Info */}
              <div className="flex-1 text-center md:text-left">
                 {course.badgeText && (
                     <span className="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-4 shadow-sm">
@@ -135,7 +124,6 @@ const CourseDetail = () => {
                 </div>
              </div>
 
-             {/* Hero Image */}
              {course.image && (
                  <div className="w-full md:w-1/3 lg:w-2/5 relative">
                      <div className="absolute inset-0 bg-white rounded-2xl transform rotate-3 scale-105 opacity-20"></div>
@@ -154,7 +142,7 @@ const CourseDetail = () => {
       <main className="container mx-auto px-4 max-w-6xl -mt-16 relative z-20 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {/* Left Column: Description & Features (Takes up 2/3) */}
+            {/* Left Column: Description & Features */}
             <div className="lg:col-span-2 space-y-8">
                 
                 {/* About Box */}
@@ -162,22 +150,25 @@ const CourseDetail = () => {
                     <h2 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${themeText}`}>
                         <FaGraduationCap /> About This Course
                     </h2>
-                    <div className="prose max-w-none text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                    <div className="prose max-w-none text-gray-700 text-lg leading-relaxed whitespace-pre-line mb-8">
                         {course.description}
                     </div>
-                    {/* Optional Course Video */}
+
+                    {/* NEW: Dynamic YouTube Video Embed */}
                     {(() => {
-                      const vid = course.youtubeUrl || course.videoUrl || course.videoId || course.video;
+                      // Look specifically for youtubeLink from our updated backend
+                      const vid = course.youtubeLink || course.youtubeUrl || course.videoUrl || course.videoId;
                       const embed = getYoutubeEmbedSrc(vid);
                       if (!embed) return null;
+                      
                       return (
-                        <div className="mt-6">
-                          <h3 className="text-xl font-semibold mb-3">Course Preview</h3>
-                          <div className="relative" style={{ paddingTop: '56.25%' }}>
+                        <div className="mt-8 border-t border-gray-100 pt-8">
+                          <h3 className={`text-xl font-bold mb-4 ${themeText}`}>Course Preview</h3>
+                          <div className="relative rounded-xl overflow-hidden shadow-lg border border-gray-100" style={{ paddingTop: '56.25%' }}>
                             <iframe
                               title="Course Video"
                               src={`${embed}?rel=0`}
-                              className="absolute inset-0 w-full h-full rounded-lg border-0"
+                              className="absolute inset-0 w-full h-full border-0"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                               allowFullScreen
                               loading="lazy"
@@ -204,19 +195,31 @@ const CourseDetail = () => {
                 )}
             </div>
 
-            {/* Right Column: Floating Action Card (Takes up 1/3) */}
+            {/* Right Column: Floating Action Card */}
             <div className="lg:col-span-1">
                 <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 sticky top-24">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to start?</h3>
                     <p className="text-gray-500 text-sm mb-6">Join hundreds of successful students who have accelerated their careers with Samarth Academy.</p>
                     
                     <div className="space-y-4">
+                        {/* NEW: Optional External Link Button */}
+                        {course.link && (
+                            <a 
+                                href={course.link} 
+                                target="_blank" 
+                                rel="noreferrer"
+                                className="w-full bg-blue-600 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-md hover:bg-blue-700 hover:shadow-lg transition-all flex items-center justify-center gap-2 transform hover:-translate-y-1"
+                            >
+                                <FaExternalLinkAlt className="text-lg" /> Visit Course Link
+                            </a>
+                        )}
+
                         {/* Primary CTA - WhatsApp Inquiry */}
                         <a 
                             href={`https://wa.me/919988949969?text=Hello! I am interested in joining the ${encodeURIComponent(course.title)} course.`} 
                             target="_blank" 
                             rel="noreferrer"
-                            className="w-full bg-green-600 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg hover:bg-green-700 hover:shadow-xl transition-all flex items-center justify-center gap-2 transform hover:-translate-y-1"
+                            className="w-full bg-green-600 text-white font-bold text-lg py-4 px-6 rounded-xl shadow-md hover:bg-green-700 hover:shadow-lg transition-all flex items-center justify-center gap-2 transform hover:-translate-y-1"
                         >
                             <FaWhatsapp className="text-2xl" /> Inquire on WhatsApp
                         </a>
