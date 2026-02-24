@@ -11,7 +11,7 @@ const Map = ({
       <iframe
         title="Samarth Academy Location"
         src={embedSrc}
-        className="w-full max-w-sm md:max-w-md h-96 rounded-xl border-0 shadow-md"
+        className="w-full max-w-screen md:max-w-md h-96 rounded-xl border-0 shadow-md"
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
         aria-hidden="false"
