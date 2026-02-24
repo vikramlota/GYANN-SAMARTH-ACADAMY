@@ -4,13 +4,15 @@ import Footer from '../components/Footer';
 import Hero from '../components/Hero';
 import FAQ from '../components/FAQ';
 import WhyUs from '../components/WhyUs';
+import Map from '../components/Map';
 const HomePage = () => {
   return (
 <>
 
- <Hero/>  
+ <Hero/> 
  <FAQ/>
  <WhyUs/>
+ <Map/>
    
 </>
   )}
