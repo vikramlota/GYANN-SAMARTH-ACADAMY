@@ -5,6 +5,7 @@ import Hero from '../components/Hero';
 import FAQ from '../components/FAQ';
 import WhyUs from '../components/WhyUs';
 import Map from '../components/Map';
+import AboutUs from '../components/AboutUs';
 const HomePage = () => {
   return (
 <>
@@ -12,8 +13,10 @@ const HomePage = () => {
  <Hero/> 
  <FAQ/>
  <WhyUs/>
+ <AboutUs/>
  <Map/>
-   
+  
+
 </>
   )}
 export default HomePage;

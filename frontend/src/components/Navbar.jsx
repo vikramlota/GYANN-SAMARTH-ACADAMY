@@ -14,7 +14,8 @@ const Navbar = () => {
     { name: 'Courses', path: '/courses' },
     { name: 'Results', path: '/selections' },
     { name: 'Notifications', path: '/notifications' },
-    { name: 'Current Affairs', path: '/current-affairs' }
+    { name: 'Current Affairs', path: '/current-affairs' },
+    { name: 'About', path: '/about' }
   ];
 
   // Helper to check if link is active

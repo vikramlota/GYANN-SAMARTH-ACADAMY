@@ -1,10 +1,11 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import { FaBullseye, FaEye, FaQuoteLeft } from 'react-icons/fa';
 import { useScrollReveal } from '../hooks';
 
 const AboutUs = () => {
   const [ref, isVisible] = useScrollReveal();
-
+const navigate = useNavigate();
   return (
     <div className="bg-white">
       {/* Hero Section */}
@@ -26,13 +27,8 @@ const AboutUs = () => {
                 Samarth Academy isn't just a coaching centre; it's a launchpad for dreams. For nearly two decades, we've been the silent force behind thousands of government success stories in Punjab.
               </p>
               <div className="flex items-center gap-4">
-                <button className="bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition shadow-xl">Our Story</button>
-                <div className="flex items-center -space-x-4">
-                   {/* Place images in public/images/team/ */}
-                   <img src="/images/team/1.jpg" alt="Student" className="w-12 h-12 rounded-full border-2 border-white object-cover" onError={(e)=>e.target.src='https://placehold.co/100'} />
-                   <img src="/images/team/2.jpg" alt="Student" className="w-12 h-12 rounded-full border-2 border-white object-cover" onError={(e)=>e.target.src='https://placehold.co/100'} />
-                   <div className="w-12 h-12 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold">+2k</div>
-                </div>
+                <button onClick={() => navigate("/book-demo")} className="bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition shadow-xl">Join us</button>
+               
               </div>
             </div>
 
@@ -40,8 +36,8 @@ const AboutUs = () => {
             <div className="lg:w-1/2 relative">
                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-brand-red/10 to-brand-orange/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
                <div className="grid grid-cols-2 gap-4">
-                  <img src="/images/about/classroom.jpg" alt="Classroom" className="rounded-2xl shadow-2xl mt-12 transform -rotate-2 hover:rotate-0 transition duration-500" onError={(e)=>e.target.src='https://placehold.co/400x500'} />
-                  <img src="/images/about/library.jpg" alt="Library" className="rounded-2xl shadow-2xl mb-12 transform rotate-2 hover:rotate-0 transition duration-500" onError={(e)=>e.target.src='https://placehold.co/400x500'} />
+                  <img src="/images/classroom.png" alt="Classroom" className="rounded-2xl shadow-2xl mt-12 transform -rotate-2 hover:rotate-0 transition duration-500" onError={(e)=>e.target.src='https://placehold.co/400x500'} />
+                  <img src="/images/library.png" alt="Library" className="rounded-2xl shadow-2xl mb-12 transform rotate-2 hover:rotate-0 transition duration-500" onError={(e)=>e.target.src='https://placehold.co/400x500'} />
                </div>
                <div className="absolute top-10 right-0 bg-white p-4 rounded-xl shadow-xl animate-bounce">
                   <p className="text-4xl font-black text-brand-red">19+</p>
@@ -58,7 +54,7 @@ const AboutUs = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div className="order-2 md:order-1 relative">
                     <div className="absolute -top-10 -left-10 w-24 h-24 bg-brand-orange/20 rounded-full"></div>
-                    <img src="/images/about/vision.jpg" alt="Vision" className="rounded-tr-[100px] rounded-bl-[100px] rounded-tl-2xl rounded-br-2xl shadow-2xl relative z-10 w-full" onError={(e)=>e.target.src='https://placehold.co/800x600'} />
+                    <img src="/images/AboutPhilosphy.png" alt="Vision" className="rounded-tr-[100px] rounded-bl-[100px] rounded-tl-2xl rounded-br-2xl shadow-2xl relative z-10 w-full" onError={(e)=>e.target.src='https://placehold.co/800x600'} />
                 </div>
                 <div className="order-1 md:order-2">
                     <h4 className="text-brand-red font-bold text-lg mb-2">The Samarth Philosophy</h4>
@@ -85,22 +81,7 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Director Note */}
-      <section className="py-20 bg-brand-bg relative overflow-hidden">
-         <div className="absolute top-0 right-0 text-[20rem] leading-none text-brand-red/5 font-serif select-none pointer-events-none"><FaQuoteLeft /></div>
-         <div className="container mx-auto px-4 relative z-10 text-center">
-            <div className="w-24 h-24 mx-auto mb-8 rounded-full p-1 border-2 border-brand-red">
-                <img src="/images/about/director.jpg" alt="Director" className="w-full h-full rounded-full object-cover grayscale hover:grayscale-0 transition duration-500" onError={(e)=>e.target.src='https://placehold.co/150'} />
-            </div>
-            <h3 className="text-2xl font-serif italic text-gray-800 mb-6 leading-relaxed max-w-4xl mx-auto">
-                "Education is not just about clearing an exam; it is about empowering a generation to serve the nation. At Samarth, we don't just teach subjects; we teach the art of perseverance."
-            </h3>
-            <div className="flex flex-col items-center">
-                <span className="font-black text-brand-red text-lg uppercase tracking-wider">Sidharth Sir</span>
-                <span className="text-sm font-medium text-gray-500">Ex-Bank Officer & Founder</span>
-            </div>
-         </div>
-      </section>
+      
 
       {/* Journey Timeline */}
       <section className="py-20 bg-white">

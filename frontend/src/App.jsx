@@ -16,6 +16,7 @@ import CurrentAffairsPage from './pages/CurrentAffairsPage.jsx'; // New Page for
 import CurrentAffairDetailPage from './pages/CurrentAffairDetailPage.jsx'; // Detail View for Current Affairs
 import CourseDetailPage from './pages/CourseDetailpage.jsx'; // Detail View for Courses
 import BookDemoPage from './pages/BookDemoPage.jsx';
+import AboutPage from './pages/About.jsx'; // New About Page
 // --- Admin Pages ---
 import Login from './admin/Login';
 import Dashboard from './admin/Dashboard.jsx';
@@ -63,6 +64,8 @@ function App() {
           {/* Results / Hall of Fame */}
           <Route path="/book-demo" element={<BookDemoPage />} />
           <Route path="/Selections" element={<SelectionPage  />} />
+
+          <Route path="/about" element={<AboutPage />} />
         
         </Route>
 
