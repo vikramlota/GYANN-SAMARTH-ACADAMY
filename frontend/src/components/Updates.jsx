@@ -32,7 +32,7 @@ const Updates = () => {
   };
 
   // Categories for filtering
-  const categories = ['All', 'Job', 'Admit', 'Result', 'Update'];
+  const categories = ['All','Job', 'Admit', 'Result', 'New Notification', 'Exam Strategy', 'Exam Pattern', 'Cut-Off Analysis'];
 
   useEffect(() => {
     const fetchUpdates = async () => {
