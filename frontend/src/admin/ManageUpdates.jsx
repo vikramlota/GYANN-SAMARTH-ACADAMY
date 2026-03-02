@@ -123,6 +123,10 @@ const ManageUpdates = () => {
                   <option value="exam strategy">Exam Strategy</option>
                   <option value="exam pattern">Exam Pattern</option>
                   <option value="cut-off analysis">Cut-Off Analysis</option>
+                  <option value="answer key">Answer Key</option>
+                  <option value="syllabus update">Syllabus Update</option>
+                  <option value="important dates">Important Dates</option>
+                  <option value="general">General</option>
                   
                </select>
              </div>
