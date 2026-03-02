@@ -113,38 +113,38 @@ const Updates = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredUpdates.map((item) => (
                     <div key={item._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
-                        {/* Image */}
-                        <div className="h-48 overflow-hidden relative">
-                            <img 
-                                src={item.imageUrl || item.linkUrl || "https://placehold.co/600x400?text=Notification+Update"} 
-                                alt={item.title} 
-                                className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                            />
-                            <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1 rounded-full uppercase shadow-md">
-                                {item.type || 'Update'}
-                            </div>
-                        </div>
+    
+    {/* Image */}
+    <Link to={`/notifications/${item.slug}`} className="h-48 overflow-hidden relative block">
+        <img 
+            src={item.imageUrl || item.linkUrl || "https://placehold.co/600x400?text=Notification+Update"} 
+            alt={item.title} 
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+        />
+        <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1 rounded-full uppercase shadow-md">
+            {item.type || 'Update'}
+        </div>
+    </Link>
 
-                        {/* Content */}
-                        <div className="p-6 flex-grow flex flex-col">
-                            <div className="flex items-center text-xs text-gray-500 mb-3">
-                                <FaCalendarAlt className="mr-1 text-brand-red"/>
-                                {new Date(item.datePosted || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </div>
-                            
-                            <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight hover:text-brand-red transition-colors">
-                                {item.title}
-                            </h3>
-                            
-                            <p className="text-gray-600 text-sm line-clamp-4 mb-4 flex-grow">
-                              {stripHtml(item.description || item.contentBody)}
-                            </p>
-
-                            <Link to={`/notifications/${item.slug}`} className="w-full mt-auto border border-red-100 bg-red-50 text-brand-red font-bold py-2 rounded-lg hover:bg-brand-red hover:text-white transition-colors text-sm block text-center">
-                                View Details
-                            </Link>
-                        </div>
-                    </div>
+    {/* Content */}
+    <div className="p-6 flex-grow flex flex-col">
+        <div className="flex items-center text-xs text-gray-500 mb-3">
+            <FaCalendarAlt className="mr-1 text-brand-red"/>
+            {new Date(item.datePosted || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+        </div>
+        
+        {/* Title as Link */}
+        <Link to={`/notifications/${item.slug}`}>
+            <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight hover:text-brand-red transition-colors">
+                {item.title}
+            </h3>
+        </Link>
+        
+        <p className="text-gray-600 text-sm line-clamp-4 mb-4 flex-grow">
+            {stripHtml(item.description || item.contentBody)}
+        </p>
+    </div>
+</div>
                 ))}
             </div>
         )}
