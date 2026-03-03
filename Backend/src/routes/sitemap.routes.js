@@ -3,8 +3,7 @@ const router = express.Router();
 
 const Course = require('../models/Course.model.js');
 const CurrentAffair = require('../models/CurrentAffair.model.js');
-const Notification = require('../models/Notification.model.js');
-
+const Update = require('../models/Update.model.js');
 // Helper function to stop Google from crashing on special characters
 const escapeXml = (unsafe) => {
     if (!unsafe) return '';
@@ -23,7 +22,7 @@ router.get('/sitemap.xml', async (req, res) => {
   try {
     const courses = await Course.find().select('slug updatedAt');
     const news = await CurrentAffair.find().select('slug updatedAt');
-    const notifications = await Notification.find().select('slug updatedAt');
+    const notifications = await Update.find().select('slug updatedAt');
 
     const baseUrl = 'https://thesamarthacademy.in';
 
