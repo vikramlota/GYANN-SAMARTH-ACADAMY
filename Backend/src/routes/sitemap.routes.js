@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
 
-// Import your models
 const Course = require('../models/Course.model.js');
 const CurrentAffair = require('../models/CurrentAffair.model.js');
 const Notification = require('../models/Notification.model.js');
 
-// Route: GET /sitemap.xml
+// Helper function to stop Google from crashing on special characters
+const escapeXml = (unsafe) => {
+    if (!unsafe) return '';
+    return unsafe.replace(/[<>&'"]/g, (c) => {
+        switch (c) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case '\'': return '&apos;';
+            case '"': return '&quot;';
+        }
+    });
+};
+
 router.get('/sitemap.xml', async (req, res) => {
   try {
     const courses = await Course.find().select('slug updatedAt');
@@ -15,43 +27,37 @@ router.get('/sitemap.xml', async (req, res) => {
 
     const baseUrl = 'https://thesamarthacademy.in';
 
-    // 1. Build the header with NO empty spaces before <?xml
+    // Strictly NO spaces before <?xml
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-    // 2. Static URLs
     xml += `  <url><loc>${baseUrl}</loc><priority>1.0</priority></url>\n`;
     xml += `  <url><loc>${baseUrl}/courses</loc><priority>0.8</priority></url>\n`;
     xml += `  <url><loc>${baseUrl}/current-affairs</loc><priority>0.8</priority></url>\n`;
     xml += `  <url><loc>${baseUrl}/notifications</loc><priority>0.8</priority></url>\n`;
 
-    // Helper function to safely format dates
-    const safeDate = (date) => {
-      return date ? date.toISOString() : new Date().toISOString();
-    };
+    const safeDate = (date) => date ? date.toISOString() : new Date().toISOString();
 
-    // 3. Loop through courses
     courses.forEach(course => {
       xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/courses/${course.slug}</loc>\n`;
+      // We wrap the slug in the escapeXml function!
+      xml += `    <loc>${baseUrl}/courses/${escapeXml(course.slug)}</loc>\n`;
       xml += `    <lastmod>${safeDate(course.updatedAt)}</lastmod>\n`;
       xml += `    <priority>0.8</priority>\n`;
       xml += `  </url>\n`;
     });
 
-    // 4. Loop through current affairs
     news.forEach(item => {
       xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/current-affairs/${item.slug}</loc>\n`;
+      xml += `    <loc>${baseUrl}/current-affairs/${escapeXml(item.slug)}</loc>\n`;
       xml += `    <lastmod>${safeDate(item.updatedAt)}</lastmod>\n`;
       xml += `    <priority>0.7</priority>\n`;
       xml += `  </url>\n`;
     });
 
-    // 5. Loop through notifications
     notifications.forEach(notification => {
       xml += `  <url>\n`;
-      xml += `    <loc>${baseUrl}/notifications/${notification.slug}</loc>\n`;
+      xml += `    <loc>${baseUrl}/notifications/${escapeXml(notification.slug)}</loc>\n`;
       xml += `    <lastmod>${safeDate(notification.updatedAt)}</lastmod>\n`;
       xml += `    <priority>0.7</priority>\n`;
       xml += `  </url>\n`;
@@ -59,7 +65,6 @@ router.get('/sitemap.xml', async (req, res) => {
 
     xml += '</urlset>';
 
-    // Send the correct content type
     res.set('Content-Type', 'text/xml');
     res.send(xml);
     
