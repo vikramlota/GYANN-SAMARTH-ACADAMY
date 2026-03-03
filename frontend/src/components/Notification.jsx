@@ -199,6 +199,11 @@ const Notification = () => {
       <style>{htmlContentStyles}</style>
       <div className="bg-gray-50 min-h-screen flex flex-col">
       {/* Header Section */}
+      <Helmet>
+            <title>{update.title} | Samarth Academy</title>
+            {/* Strip HTML tags for the description and limit to 160 chars */}
+            <meta name="description" content={update.description?.replace(/<[^>]+>/g, '').substring(0, 160)} />
+          </Helmet>
       <header className="relative bg-brand-red pt-24 pb-20 overflow-hidden text-center">
         <div className="container mx-auto px-4 relative z-10">
           <Link to="/notifications" className="inline-flex items-center py-1 px-3 rounded-full bg-white/10 border border-white/20 text-brand-orange font-bold text-xs mb-4 tracking-wider uppercase hover:bg-white/20 transition-colors">
