@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
 import { Link } from 'react-router-dom';
 import { FaCalendarAlt, FaSearch, FaTag, FaBell } from 'react-icons/fa';
-
+import { Helmet } from 'react-helmet-async';
 const Updates = () => {
   const [updates, setUpdates] = useState([]);
   const [loading, setLoading] = useState(true);

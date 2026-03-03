@@ -5,7 +5,7 @@ import {
   FaArrowLeft, FaUniversity, FaPrint, FaCalendarAlt, 
   FaExternalLinkAlt, FaTag, FaWhatsapp, FaShare 
 } from 'react-icons/fa';
-
+import { Helmet } from 'react-helmet-async';
 const Notification = () => {
   // Styles for rendered HTML content
   const htmlContentStyles = `
