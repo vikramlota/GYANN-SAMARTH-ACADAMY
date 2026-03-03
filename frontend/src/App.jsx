@@ -45,6 +45,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
+      
       <Routes>
         
         {/* PUBLIC WEBSITE ROUTES */}
@@ -89,6 +90,7 @@ function App() {
         </Route>
 
       </Routes>
+      <meta name="google-site-verification" content="sU9wMoN5Gp_yNILWMxUHvDdMtUKh4EP4w9n9KUPZb6M" />
     </Router>
   );
 }
