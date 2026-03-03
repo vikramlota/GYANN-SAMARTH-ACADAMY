@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { FaArrowLeft, FaCalendarAlt, FaShare, FaNewspaper, FaTags } from 'react-icons/fa';
-
+import { Helmet } from 'react-helmet-async';
 const CurrentAffairsDetailPage = () => {
   const { slug } = useParams();
   const [article, setArticle] = useState(null);
@@ -98,7 +98,11 @@ const CurrentAffairsDetailPage = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col font-sans">
-      
+      <Helmet>
+      <title>{article.headline} | Samarth Academy</title>
+      {/* Strip HTML tags for the description and limit to 160 chars */}
+      <meta name="description" content={article.contentBody?.replace(/<[^>]+>/g, '').substring(0, 160)} />
+    </Helmet>
       {/* Header Section */}
       <header className="relative bg-brand-red pt-24 pb-20 overflow-hidden">
         {/* Background Overlay Pattern */}

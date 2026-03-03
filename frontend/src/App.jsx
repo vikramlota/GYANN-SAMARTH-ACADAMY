@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import './App.css';
+import { HelmetProvider } from 'react-helmet-async';
 // --- Layouts ---
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -44,6 +45,7 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
+    <HelmetProvider>
     <Router>
       
       <Routes>
@@ -92,6 +94,7 @@ function App() {
       </Routes>
       
     </Router>
+    </HelmetProvider>
   );
 }
 

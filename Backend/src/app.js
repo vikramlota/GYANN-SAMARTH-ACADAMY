@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const connectDB = require('./db/index.js');
 const demoRoutes = require('./routes/demo.routes.js');
 const app = express()
-
+const sitemapRoutes = require('./routes/sitemap.routes.js');
 // Connect to database on startup
 connectDB().catch((error) => {
   console.error("Failed to connect to database:", error);
@@ -16,13 +16,7 @@ app.use(cors({
   credentials: true,
 }));
 
-// Health check endpoint
-app.get("/api/v1/health", (req, res) => {
-    res.status(200).json({ 
-        status: "OK", 
-        message: "Server is running!" 
-    });
-});
+
 
 app.use(express.json({limit: "16kb"}))
 app.use(express.urlencoded({extended: true,limit: "16kb"}))
@@ -30,6 +24,7 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 // Routes
+app.use('/', sitemapRoutes);
 app.use('/api/admin', require('./routes/Admin.routes.js'));
 app.use('/api/courses', require('./routes/course.routes.js'));
 app.use('/api/results', require('./routes/result.routes.js'));
