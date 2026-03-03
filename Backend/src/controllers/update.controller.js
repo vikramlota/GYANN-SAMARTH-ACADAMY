@@ -1,7 +1,7 @@
 const Update = require('../models/Update.model.js');
 const CurrentAffair = require('../models/CurrentAffair.model.js');
 const { uploadOnCloudinary } = require('../utils/cloudinary.js');
-
+const { notifyGoogle } = require('../utils/googleIndexing.js');
 // --- UTILITY FUNCTION to generate slug ---
 const generateSlug = (title) => {
   return title
@@ -106,7 +106,14 @@ const createUpdate = async (req, res) => {
     
     // The pre-save hook will automatically generate slug from title
     const update = await Update.create(body);
-    res.status(201).json(update);
+    const savedUpdate = await update.save();
+
+    // --- PING GOOGLE INSTANTLY ---
+    const updateUrl = `https://thesamarthacademy.in/updates/${savedUpdate.slug}`;
+    await notifyGoogle(updateUrl, 'URL_UPDATED');
+    // -----------------------------
+
+    res.status(201).json(savedUpdate);
   } catch (error) {
     console.error("❌ Error creating notification:", error);
     res.status(400).json({ message: error.message, details: error.toString() });
@@ -115,7 +122,9 @@ const createUpdate = async (req, res) => {
 
 const deleteUpdate = async (req, res) => {
   try {
-    await Update.findByIdAndDelete(req.params.id);
+    const deletedUpdate = await Update.findByIdAndDelete(req.params.id);
+    const updateUrl = `https://thesamarthacademy.in/updates/${deletedUpdate.slug}`;
+    await notifyGoogle(updateUrl, 'URL_DELETED');
     res.json({ message: 'Update removed' });
   } catch (error) {
     res.status(500).json({ message: error.message });

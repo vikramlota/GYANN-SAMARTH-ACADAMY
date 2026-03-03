@@ -2,7 +2,7 @@ const Course = require('../models/Course.model.js');
 const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 const fs = require('fs');
 const path = require('path');
-
+const { notifyGoogle } = require('../utils/googleIndexing.js');
 // --- UTILITY FUNCTION to generate slug ---
 const generateSlug = (title) => {
   return title
@@ -109,7 +109,8 @@ const createCourse = async (req, res) => {
 
     const course = new Course(courseData);
     const createdCourse = await course.save();
-    
+    const courseUrl = `https://thesamarthacademy.in/courses/${createdCourse.slug}`;
+    await notifyGoogle(courseUrl, 'URL_UPDATED');
     res.status(201).json(createdCourse);
 
   } catch (error) {

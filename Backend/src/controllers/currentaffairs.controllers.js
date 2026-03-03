@@ -1,6 +1,6 @@
 const CurrentAffair = require('../models/CurrentAffair.model.js'); // Ensure filename matches your model file
 const { uploadOnCloudinary } = require("../utils/cloudinary.js");
-
+const { notifyGoogle } = require('../utils/googleIndexing.js');
 // --- UTILITY FUNCTION to generate slug ---
 const generateSlug = (title) => {
   return title
@@ -73,8 +73,13 @@ const createCurrentAffair = async (req, res) => {
       isSpotlight: isSpotlight === 'true', // Convert string "true" to boolean
       imageUrl
     });
+    const savedArticle = await newArticle.save();
+
+    // --- PING GOOGLE INSTANTLY ---
+    const articleUrl = `https://thesamarthacademy.in/current-affairs/${savedArticle.slug}`;
+    await notifyGoogle(articleUrl, 'URL_UPDATED');
     
-    res.status(201).json(newArticle);
+    res.status(201).json(savedArticle);
   } catch (error) {
     console.error("❌ Error creating current affair:", error);
     res.status(400).json({ message: error.message, details: error.toString() });
@@ -91,6 +96,10 @@ const deleteCurrentAffair = async (req, res) => {
     if (!article) {
       return res.status(404).json({ message: 'Article not found' });
     }
+    
+    // --- PING GOOGLE BEFORE DELETING ---
+    const articleUrl = `https://thesamarthacademy.in/current-affairs/${article.slug}`;
+    await notifyGoogle(articleUrl, 'URL_DELETED');
 
     await CurrentAffair.findByIdAndDelete(req.params.id);
     res.json({ message: 'Article removed' });
