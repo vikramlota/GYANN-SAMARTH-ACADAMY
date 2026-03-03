@@ -1,16 +1,30 @@
 const { google } = require('googleapis');
-const path = require('path');
 
-// Point this to where you saved the JSON file in the previous step
-const keyPath = path.join(__dirname, '../../config/google-credentials.json');
+// Pull credentials from the .env file
+const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
 
-// Initialize the Google Auth Client
+// CRITICAL FIX: .env files often mess up the newline characters in private keys.
+// This replace() function ensures the \n characters are read correctly by Google.
+const privateKey = process.env.GOOGLE_PRIVATE_KEY 
+  ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n') 
+  : '';
+
+// Initialize the Google Auth Client using the credentials directly
 const authClient = new google.auth.GoogleAuth({
-  keyFile: keyPath,
+  credentials: {
+    client_email: clientEmail,
+    private_key: privateKey,
+  },
   scopes: ['https://www.googleapis.com/auth/indexing'],
 });
 
 const notifyGoogle = async (url, action = 'URL_UPDATED') => {
+  // Safety check: Don't attempt to ping Google if the .env variables are missing
+  if (!clientEmail || !privateKey) {
+    console.warn("⚠️ Google Indexing skipped: Missing GOOGLE_CLIENT_EMAIL or GOOGLE_PRIVATE_KEY in .env");
+    return false;
+  }
+
   try {
     // 1. Get the authorized client
     const client = await authClient.getClient();
