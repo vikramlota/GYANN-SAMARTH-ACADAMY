@@ -24,7 +24,7 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 // Routes
-app.use('/', sitemapRoutes);
+app.use('/api', sitemapRoutes);
 app.use('/api/admin', require('./routes/Admin.routes.js'));
 app.use('/api/courses', require('./routes/course.routes.js'));
 app.use('/api/results', require('./routes/result.routes.js'));

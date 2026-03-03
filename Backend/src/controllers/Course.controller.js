@@ -3,15 +3,6 @@ const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 const fs = require('fs');
 const path = require('path');
 const { notifyGoogle } = require('../utils/googleIndexing.js');
-// --- UTILITY FUNCTION to generate slug ---
-const generateSlug = (title) => {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-};
 
 // @desc    Get all courses
 // @route   GET /api/courses
@@ -32,20 +23,13 @@ const createCourse = async (req, res) => {
   let tempFilePath = null;
   
   try {
-    // 1. DEBUGGING: Check what we actually received
-    console.log("➡️ Request Body:", req.body);
-    console.log("➡️ Request File:", req.file);
-
-    // 2. VALIDATION: Check if file exists immediately
-    // If Multer didn't pick up a file, req.file will be undefined.
     if (!req.file) {
         return res.status(400).json({ message: "❌ Image file is missing in the request." });
     }
 
-    // 3. UPLOAD LOGIC
+    // UPLOAD LOGIC
     let imageUrl = "";
     try {
-        // Handle Buffer (Memory Storage) vs Path (Disk Storage)
         if (req.file.buffer) {
             tempFilePath = path.join('/tmp', `${Date.now()}-${req.file.originalname}`);
             fs.writeFileSync(tempFilePath, req.file.buffer);
@@ -53,7 +37,6 @@ const createCourse = async (req, res) => {
             tempFilePath = req.file.path;
         }
         
-        console.log("➡️ Uploading to Cloudinary...");
         const cloudinaryResponse = await uploadOnCloudinary(tempFilePath);
         
         if (!cloudinaryResponse?.secure_url) {
@@ -61,56 +44,47 @@ const createCourse = async (req, res) => {
         }
         
         imageUrl = cloudinaryResponse.secure_url;
-        console.log("✅ Image Uploaded:", imageUrl);
-
     } catch (uploadError) {
         throw new Error(`Image upload failed: ${uploadError.message}`);
     } finally {
-        // Clean up temp file
         if (tempFilePath && fs.existsSync(tempFilePath)) {
             try { fs.unlinkSync(tempFilePath); } catch (e) { console.error("Cleanup error:", e); }
         }
     }
 
-    // 4. PARSE FEATURES (Handle array or indexed fields)
+    // PARSE FEATURES
     let features = [];
     if (req.body.features) {
-        // If it came as a JSON string or array
         features = Array.isArray(req.body.features) ? req.body.features : [req.body.features];
     } else {
-        // If it came as features[0], features[1] (FormData standard)
         Object.keys(req.body).forEach((key) => {
             const m = key.match(/^features\[(\d+)\]$/);
             if (m) features[Number(m[1])] = req.body[key];
         });
     }
-    // Remove empty/null values
     features = features.filter(f => f);
 
-    // 5. MANUAL CONSTRUCTION
+    // MANUAL CONSTRUCTION (Slug comes directly from req.body now)
     const courseData = {
         title: req.body.title,
-        slug: req.body.slug,
+        slug: req.body.slug, 
         description: req.body.description,
         category: req.body.category,
         badgeText: req.body.badgeText,
-        
-        // ---> ADDED THE TWO NEW LINKS HERE <---
         link: req.body.link,
         youtubeLink: req.body.youtubeLink,
-        // --------------------------------------
-
         colorTheme: req.body.colorTheme, 
         features: features,
         image: imageUrl, 
     };
 
-    console.log("➡️ Saving Course to DB:", courseData);
-
     const course = new Course(courseData);
     const createdCourse = await course.save();
+
+    // --- PING GOOGLE INSTANTLY ---
     const courseUrl = `https://thesamarthacademy.in/courses/${createdCourse.slug}`;
     await notifyGoogle(courseUrl, 'URL_UPDATED');
+
     res.status(201).json(createdCourse);
 
   } catch (error) {
@@ -128,7 +102,6 @@ const updateCourse = async (req, res) => {
         const { slug } = req.params;
         let course;
         
-        // Check if param is a MongoDB ObjectId or a slug
         if (slug.match(/^[0-9a-fA-F]{24}$/)) {
           course = await Course.findById(slug);
         } else {
@@ -139,10 +112,9 @@ const updateCourse = async (req, res) => {
             return res.status(404).json({ message: "Course not found" });
         }
 
-        // The spread operator will automatically pull in req.body.youtubeLink
         const body = { ...req.body };
 
-        // 1. Handle New Image Upload (If provided)
+        // Handle Image Upload
         if (req.file) {
             try {
                  if (req.file.buffer) {
@@ -166,13 +138,13 @@ const updateCourse = async (req, res) => {
             }
         }
 
-        // 2. Handle Features Array Update
+        // Handle Features
         const features = [];
         Object.keys(body).forEach((key) => {
             const m = key.match(/^features\[(\d+)\]$/);
             if (m) {
                 features[Number(m[1])] = body[key];
-                delete body[key]; // Remove the raw key
+                delete body[key];
             }
         });
         
@@ -180,12 +152,15 @@ const updateCourse = async (req, res) => {
             body.features = features.filter(f => f !== undefined && f !== null);
         }
 
-        // 3. Update the course
         const updatedCourse = await Course.findByIdAndUpdate(
             course._id,
             { $set: body },
             { new: true, runValidators: true } 
         );
+
+        // --- PING GOOGLE INSTANTLY ---
+        const courseUrl = `https://thesamarthacademy.in/courses/${updatedCourse.slug}`;
+        await notifyGoogle(courseUrl, 'URL_UPDATED');
 
         res.json(updatedCourse);
 
@@ -211,6 +186,11 @@ const deleteCourse = async (req, res) => {
     
     if (course) {
       await Course.deleteOne({ _id: course._id });
+
+      // --- PING GOOGLE INSTANTLY ---
+      const courseUrl = `https://thesamarthacademy.in/courses/${course.slug}`;
+      await notifyGoogle(courseUrl, 'URL_DELETED');
+
       res.json({ message: 'Course removed successfully', deletedCourse: course });
     } else {
       res.status(404).json({ message: 'Course not found' });
@@ -237,21 +217,8 @@ const getCourseById = async (req, res) => {
         const regexSlug = new RegExp(`^${param}$`, 'i');
         course = await Course.findOne({ slug: regexSlug });
       }
-
-      if (!course) {
-        const allCourses = await Course.find({});
-        for (const doc of allCourses) {
-          const generatedSlug = generateSlug(doc.title);
-          if (generatedSlug === param) {
-            course = doc;
-            if (!doc.slug) {
-              doc.slug = generatedSlug;
-              await doc.save();
-            }
-            break;
-          }
-        }
-      }
+      
+      // Removed the heavy database fallback loop here!
     }
 
     if (!course) {

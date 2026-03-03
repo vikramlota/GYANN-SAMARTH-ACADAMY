@@ -2,17 +2,8 @@ const Update = require('../models/Update.model.js');
 const CurrentAffair = require('../models/CurrentAffair.model.js');
 const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 const { notifyGoogle } = require('../utils/googleIndexing.js');
-// --- UTILITY FUNCTION to generate slug ---
-const generateSlug = (title) => {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-};
 
-// --- NOTIFICATIONS ---
+// --- NOTIFICATIONS / UPDATES ---
 const getUpdates = async (req, res) => {
   try {
     const updates = await Update.find({}).sort({ datePosted: -1 });
@@ -29,37 +20,17 @@ const getUpdateById = async (req, res) => {
 
     // Check if param is a MongoDB ObjectId or a slug
     if (param.match(/^[0-9a-fA-F]{24}$/)) {
-      // It's a valid MongoDB ObjectId
       update = await Update.findById(param);
     } else {
-      // It's a slug, search by slug field
       update = await Update.findOne({ slug: param });
       
-      // If slug not found and param looks like it might be a title slug attempt,
-      // try searching case-insensitively
+      // If slug not found, try case-insensitive
       if (!update) {
         const regexSlug = new RegExp(`^${param}$`, 'i');
         update = await Update.findOne({ slug: regexSlug });
       }
-
-      // If still not found, try to find by generating slug from title
-      // This handles cases where the slug wasn't generated yet
-      if (!update) {
-        // Search through all documents and find one whose generated slug matches
-        const allUpdates = await Update.find({});
-        for (const doc of allUpdates) {
-          const generatedSlug = generateSlug(doc.title);
-          if (generatedSlug === param) {
-            update = doc;
-            // Auto-save the generated slug to the document
-            if (!doc.slug) {
-              doc.slug = generatedSlug;
-              await doc.save();
-            }
-            break;
-          }
-        }
-      }
+      
+      // Removed the heavy database fallback loop here!
     }
 
     if (!update) {
@@ -97,23 +68,20 @@ const createUpdate = async (req, res) => {
       }
     }
     
-    // Normalize type enum values (accept lowercase from frontend)
+    // Normalize type enum values
     if (body.type && typeof body.type === 'string') {
       const map = { job: 'Job', admit: 'AdmitCard', result: 'Result', notice: 'Notice' };
       const low = body.type.toLowerCase();
       if (map[low]) body.type = map[low];
     }
     
-    // The pre-save hook will automatically generate slug from title
     const update = await Update.create(body);
-    const savedUpdate = await update.save();
 
     // --- PING GOOGLE INSTANTLY ---
-    const updateUrl = `https://thesamarthacademy.in/updates/${savedUpdate.slug}`;
+    const updateUrl = `https://thesamarthacademy.in/updates/${update.slug}`;
     await notifyGoogle(updateUrl, 'URL_UPDATED');
-    // -----------------------------
 
-    res.status(201).json(savedUpdate);
+    res.status(201).json(update);
   } catch (error) {
     console.error("❌ Error creating notification:", error);
     res.status(400).json({ message: error.message, details: error.toString() });
@@ -123,9 +91,16 @@ const createUpdate = async (req, res) => {
 const deleteUpdate = async (req, res) => {
   try {
     const deletedUpdate = await Update.findByIdAndDelete(req.params.id);
-    const updateUrl = `https://thesamarthacademy.in/updates/${deletedUpdate.slug}`;
-    await notifyGoogle(updateUrl, 'URL_DELETED');
-    res.json({ message: 'Update removed' });
+    
+    if (deletedUpdate) {
+        // --- PING GOOGLE INSTANTLY ---
+        const updateUrl = `https://thesamarthacademy.in/updates/${deletedUpdate.slug}`;
+        await notifyGoogle(updateUrl, 'URL_DELETED');
+        
+        res.json({ message: 'Update removed' });
+    } else {
+        res.status(404).json({ message: 'Update not found' });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -139,14 +114,14 @@ const updateUpdate = async (req, res) => {
 
     const body = { ...req.body };
 
-    // Normalize type enum values (accept lowercase from frontend)
+    // Normalize type enum values
     if (body.type && typeof body.type === 'string') {
       const map = { job: 'Job', admit: 'AdmitCard', result: 'Result', notice: 'Notice' };
       const low = body.type.toLowerCase();
       if (map[low]) body.type = map[low];
     }
 
-    // If file uploaded, upload to Cloudinary and set imageUrl
+    // Handle Image Upload
     if (req.file) {
       try {
         const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
@@ -162,11 +137,15 @@ const updateUpdate = async (req, res) => {
 
     // Apply updates and save
     Object.keys(body).forEach(key => {
-      // Avoid overwriting with undefined
       if (typeof body[key] !== 'undefined') update[key] = body[key];
     });
 
     await update.save();
+
+    // --- PING GOOGLE INSTANTLY ---
+    const updateUrl = `https://thesamarthacademy.in/updates/${update.slug}`;
+    await notifyGoogle(updateUrl, 'URL_UPDATED');
+
     res.json(update);
   } catch (error) {
     console.error('Error updating notification:', error);
@@ -197,6 +176,11 @@ const createCurrentAffair = async (req, res) => {
     }
     
     const news = await CurrentAffair.create(body);
+
+    // --- PING GOOGLE INSTANTLY ---
+    const newsUrl = `https://thesamarthacademy.in/current-affairs/${news.slug}`;
+    await notifyGoogle(newsUrl, 'URL_UPDATED');
+
     res.status(201).json(news);
   } catch (error) {
     res.status(400).json({ message: error.message });

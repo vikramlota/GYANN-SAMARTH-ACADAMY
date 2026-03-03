@@ -5,7 +5,7 @@ import {
   FaArrowLeft, FaCheckCircle, FaWhatsapp, FaShare, 
   FaTag, FaGraduationCap, FaChalkboardTeacher, FaClock, FaExternalLinkAlt 
 } from 'react-icons/fa'; // Added FaExternalLinkAlt
-
+import { Helmet } from 'react-helmet-async';
 const CourseDetail = () => {
   const { slug } = useParams();
   const [course, setCourse] = useState(null);
@@ -94,7 +94,18 @@ const CourseDetail = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col font-sans">
-      
+      <Helmet>
+        {/* Google Search Title & Description */}
+        <title>{course.title} | Samarth Academy</title>
+        <meta name="description" content={course.description.substring(0, 160)} />
+        
+        {/* Open Graph Tags (For beautiful WhatsApp/Facebook sharing) */}
+        <meta property="og:title" content={`${course.title} | Samarth Academy`} />
+        <meta property="og:description" content={course.description.substring(0, 160)} />
+        <meta property="og:image" content={course.image} />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:type" content="website" />
+      </Helmet>
       {/* --- HERO SECTION --- */}
       <header className={`relative bg-gradient-to-r ${themeBg} ${course.colorTheme?.to || 'to-red-900'} pt-24 pb-32 overflow-hidden`}>
         <div className="absolute inset-0 bg-black/20"></div>
