@@ -256,7 +256,7 @@ const ManageCourses = () => {
             {/* Description */}
             <div>
                 <label className="text-xs font-bold text-gray-500 uppercase">Description</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} rows="3" maxLength="500" required className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-brand-red" />
+                <textarea name="description" value={formData.description} onChange={handleChange} rows="3" maxLength="10000" required className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-brand-red" />
             </div>
 
             {/* Color Theme */}
