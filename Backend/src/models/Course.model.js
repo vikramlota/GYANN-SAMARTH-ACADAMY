@@ -43,7 +43,7 @@ const CourseSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['SSC', 'Banking', 'State', 'Defence', 'Teaching', 'Other'],
+    enum: ['SSC', 'Banking', 'State', 'Defence', 'Teaching', 'Punjab Police', 'Other'],
     required: true
   },
   features: [{

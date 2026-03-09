@@ -213,6 +213,7 @@ const ManageCourses = () => {
                         <option value="State">State Exams</option>
                         <option value="Defence">Defence</option>
                         <option value="Teaching">Teaching</option>
+                        <option value="Punjab Police">Punjab Police</option>
                         <option value="Other">Other</option>
                     </select>
                 </div>
