@@ -116,8 +116,8 @@ const ManageUpdates = () => {
              <div>
                <label className="text-xs font-bold text-gray-500 uppercase">Type</label>
                <select name="type" value={formData.type} onChange={(e)=>setFormData({...formData, type:e.target.value})} className="w-full border p-2 rounded bg-white">
-                  <option value="job">New Job</option>
-                  <option value="admit">Admit Card Update</option>
+                  <option value="Job">New Job</option>
+                  <option value="Admit Card Update">Admit Card Update</option>
                   <option value="Result">Result Declared</option>
                   <option value="New Notification">New Notification</option>
                   <option value="Exam Strategy">Exam Strategy</option>
