@@ -118,15 +118,15 @@ const ManageUpdates = () => {
                <select name="type" value={formData.type} onChange={(e)=>setFormData({...formData, type:e.target.value})} className="w-full border p-2 rounded bg-white">
                   <option value="job">New Job</option>
                   <option value="admit">Admit Card Update</option>
-                  <option value="result">Result Declared</option>
+                  <option value="Result">Result Declared</option>
                   <option value="New Notification">New Notification</option>
-                  <option value="exam strategy">Exam Strategy</option>
-                  <option value="exam pattern">Exam Pattern</option>
-                  <option value="cut-off analysis">Cut-Off Analysis</option>
-                  <option value="answer key">Answer Key</option>
-                  <option value="syllabus update">Syllabus Update</option>
-                  <option value="important dates">Important Dates</option>
-                  <option value="general">General</option>
+                  <option value="Exam Strategy">Exam Strategy</option>
+                  <option value="Exam Pattern">Exam Pattern</option>
+                  <option value="Cut-Off Analysis">Cut-Off Analysis</option>
+                  <option value="Answer Key">Answer Key</option>
+                  <option value="Syllabus Update">Syllabus Update</option>
+                  <option value="Important Dates">Important Dates</option>
+                  <option value="General">General</option>
                   
                </select>
              </div>
