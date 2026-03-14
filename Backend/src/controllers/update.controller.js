@@ -7,7 +7,12 @@ const { notifyGoogle } = require('../utils/googleIndexing.js');
 const getUpdates = async (req, res) => {
   try {
     const updates = await Update.find({}).sort({ datePosted: -1 });
-    res.json(updates);
+    // Ensure image URLs are HTTPS
+    const sanitizedUpdates = updates.map(item => ({
+      ...item.toObject(),
+      imageUrl: item.imageUrl ? item.imageUrl.replace(/^http:/, 'https:') : item.imageUrl
+    }));
+    res.json(sanitizedUpdates);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -36,7 +41,12 @@ const getUpdateById = async (req, res) => {
     if (!update) {
       return res.status(404).json({ message: 'Update not found', searchedParam: param });
     }
-    res.json(update);
+    // Ensure image URL is HTTPS
+    const sanitizedUpdate = {
+      ...update.toObject(),
+      imageUrl: update.imageUrl ? update.imageUrl.replace(/^http:/, 'https:') : update.imageUrl
+    };
+    res.json(sanitizedUpdate);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,7 +69,7 @@ const createUpdate = async (req, res) => {
       try {
         const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
         if (uploadResult) {
-          body.imageUrl = uploadResult.url;
+          body.imageUrl = uploadResult.secure_url;
           console.log("✅ Notification image uploaded to Cloudinary:", body.imageUrl);
         }
       } catch (uploadError) {
@@ -126,7 +136,7 @@ const updateUpdate = async (req, res) => {
       try {
         const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
         if (uploadResult) {
-          body.imageUrl = uploadResult.url;
+          body.imageUrl = uploadResult.secure_url;
           console.log("✅ Notification image uploaded to Cloudinary (update):", body.imageUrl);
         }
       } catch (uploadError) {
@@ -157,7 +167,12 @@ const updateUpdate = async (req, res) => {
 const getCurrentAffairs = async (req, res) => {
   try {
     const news = await CurrentAffair.find({}).sort({ date: -1 });
-    res.json(news);
+    // Ensure image URLs are HTTPS
+    const sanitizedNews = news.map(item => ({
+      ...item.toObject(),
+      imageUrl: item.imageUrl ? item.imageUrl.replace(/^http:/, 'https:') : item.imageUrl
+    }));
+    res.json(sanitizedNews);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -171,7 +186,7 @@ const createCurrentAffair = async (req, res) => {
     if (req.file) {
       const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
       if (uploadResult) {
-        body.imageUrl = uploadResult.url;
+        body.imageUrl = uploadResult.secure_url;
       }
     }
     

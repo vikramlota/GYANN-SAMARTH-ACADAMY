@@ -20,7 +20,7 @@ const SuccessStorySchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    default: '/images/students/default-avatar.png'
+    required: false
   },
   year: {
     type: Number,

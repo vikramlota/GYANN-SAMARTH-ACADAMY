@@ -174,11 +174,15 @@ const ManageCurrentAffairs = () => {
                         >
                             <option value="National">National</option>
                             <option value="International">International</option>
+                            <option value="Defence">Defence</option>
                             <option value="Sports">Sports</option>
                             <option value="Science">Science & Tech</option>
                             <option value="Economy">Economy</option>
                             <option value="Tech">Tech</option>
                             <option value="Awards">Awards</option>
+                            <option value="Important Days">Important Days</option>
+                            <option value="Obituary">Obituary</option>
+                            <option value="Miscellaneous">Miscellaneous</option>
                         </select>
                     </div>
 

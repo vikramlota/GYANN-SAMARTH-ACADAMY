@@ -9,7 +9,12 @@ const getCurrentAffairs = async (req, res) => {
   try {
     // Sort by most recent date
     const news = await CurrentAffair.find({}).sort({ date: -1 });
-    res.json(news);
+    // Ensure image URLs are HTTPS
+    const sanitizedNews = news.map(item => ({
+      ...item.toObject(),
+      imageUrl: item.imageUrl ? item.imageUrl.replace(/^http:/, 'https:') : item.imageUrl
+    }));
+    res.json(sanitizedNews);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -37,7 +42,7 @@ const createCurrentAffair = async (req, res) => {
       try {
         const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
         if (uploadResult) {
-          imageUrl = uploadResult.url;
+          imageUrl = uploadResult.secure_url;
           console.log("✅ Image uploaded to Cloudinary:", imageUrl);
         } else {
           console.warn("⚠️ Cloudinary upload returned null");
@@ -113,7 +118,7 @@ const updateCurrentAffair = async (req, res) => {
     if (req.file) {
       const uploadResult = await uploadOnCloudinary(req.file.buffer, req.file.originalname);
       if (uploadResult) {
-        article.imageUrl = uploadResult.url;
+        article.imageUrl = uploadResult.secure_url;
       }
     }
 
@@ -158,7 +163,12 @@ const getCurrentAffairBySlug = async (req, res) => {
   try {
     const article = await CurrentAffair.findOne({ slug: req.params.slug });
     if (article) {
-      res.json(article);
+      // Ensure image URL is HTTPS
+      const sanitizedArticle = {
+        ...article.toObject(),
+        imageUrl: article.imageUrl ? article.imageUrl.replace(/^http:/, 'https:') : article.imageUrl
+      };
+      res.json(sanitizedArticle);
     } else {
       res.status(404).json({ message: 'Article not found' });
     }

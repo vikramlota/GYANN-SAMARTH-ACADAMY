@@ -27,7 +27,7 @@ const CurrentAffairSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['National', 'International', 'Tech', 'Awards', 'Sports', 'Economy'],
+    enum: ['National', 'International', 'Tech', 'Awards', 'Sports', 'Economy', 'Defence', 'Important Days', 'Obituary', 'Miscellaneous'],
     required: true
   },
   tags: [{

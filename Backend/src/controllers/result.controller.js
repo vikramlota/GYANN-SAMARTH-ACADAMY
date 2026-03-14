@@ -5,7 +5,12 @@ const { uploadOnCloudinary } = require('../utils/cloudinary.js');
 // @route   GET /api/results
 const getResults = async (req, res) => {
   const results = await SuccessStory.find({}).sort({ year: -1 });
-  res.json(results);
+  // Ensure image URLs are HTTPS
+  const sanitizedResults = results.map(item => ({
+    ...item.toObject(),
+    imageUrl: item.imageUrl ? item.imageUrl.replace(/^http:/, 'https:') : item.imageUrl
+  }));
+  res.json(sanitizedResults);
 };
 
 // @desc    Add a result
